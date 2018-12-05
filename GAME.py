@@ -64,14 +64,13 @@ from asd import display_merchant
 from asd import display_village
 from asd import display_crew
 
+
 # ITEMS: NAME/AMOUNT/COST/ATTRIBUTE
 
 def display_inventory(energy):
-
     for e in inventory:
         if inventory[e][0] != 0:
             print(e, inventory[e][0])  # print inventory elements if have any of it.
-
 
     while True:
         print("     min _________________________ max")
@@ -202,7 +201,8 @@ def F(gold, energy):
                         print()
                         if "trader" in companions:
                             gold -= int(Y * (vendor[X][1] * 0.9))
-                            print("You saved " + colored(str((Y * vendor[X][1]) - int((Y * (vendor[X][1] * 0.9)))), "yellow") + " gold. Thanks to your Trader!")
+                            print("You saved " + colored(str((Y * vendor[X][1]) - int((Y * (vendor[X][1] * 0.9)))),
+                                                         "yellow") + " gold. Thanks to your Trader!")
                         else:
                             gold -= Y * vendor[X][1]
                         if X in inventory:
@@ -230,7 +230,9 @@ def F(gold, energy):
                         print()
                         if "trader" in companions:
                             gold += int(Y * (inventory[X][1] * 1.1))
-                            print("You earned " + colored(str(int((int(Y * (inventory[X][1] * 1.1)))) - (Y * inventory[X][1])), "yellow") + " extra gold. Thanks to your Trader!")
+                            print("You earned " + colored(
+                                str(int((int(Y * (inventory[X][1] * 1.1)))) - (Y * inventory[X][1])),
+                                "yellow") + " extra gold. Thanks to your Trader!")
                             if inventory[X][0] == 0:
                                 inventory.pop(X, None)
                             print("My gold: " + colored(str(gold), "yellow"))
@@ -298,10 +300,10 @@ def F(gold, energy):
 
 four_steps = []  # saves the current moves number for later use (after 4 steps its used)
 
+
 def O(energy):  # Function on Shrines.
     display_shrine()
     global four_steps
-
 
     for e in O_coordinate:
         if position == e:
@@ -311,7 +313,6 @@ def O(energy):  # Function on Shrines.
 
     if position not in O_coordinate:
         O_coordinate.append(position.copy())
-
 
     input("You see an old shrine in the distance. Not sure why, but you feel the need to get closer.")
     input("You feel almost like... its calling you... ")
@@ -411,6 +412,7 @@ def O(energy):  # Function on Shrines.
 
 S_coordinate = []
 
+
 def S(energy):
     global four_steps
 
@@ -461,6 +463,7 @@ def S(energy):
 ##### B
 
 B_coordinate = []
+
 
 def B(energy):
     for e in B_coordinate:
@@ -527,9 +530,9 @@ def curse_Volcano(map):
                 H_coordinates.append([row_index, column_index])
                 steps.append(sum([abs(position[0] - row_index), (abs(position[1] - column_index))]))
 
-    H = H_coordinates[steps.index(min(steps))] # coordinate of the closest H to our position
+    H = H_coordinates[steps.index(min(steps))]  # coordinate of the closest H to our position
 
-    map[H[0]][H[1]] = "@"   # Change the closest H to our position to @ (volcano)
+    map[H[0]][H[1]] = "@"  # Change the closest H to our position to @ (volcano)
     Volcano_coordinate.append([map.index(map[H[0]]), map.index(map[H[1]])])
 
     if H[0] - 1 > 0 and map[H[0] - 1][H[1]] not in "TVSHOF":
@@ -587,7 +590,7 @@ def curse_geyser():
     if position not in O_coordinate:
         O_coordinate.append(position.copy())
 
-    map[W[0]][W[1]] = "G"   # change the closest V to our position to G
+    map[W[0]][W[1]] = "G"  # change the closest V to our position to G
 
     if W[0] - 2 >= 0 and map[W[0] - 2][W[1]] not in "TVSHO":
         if map[W[0] - 2][W[1]] == ".":
@@ -723,6 +726,7 @@ def curse_geyser():
 slots_cost = 1
 allowed_slots = 8
 
+
 def slots():
     global slots_cost
     if len(inventory) > allowed_slots:
@@ -734,60 +738,74 @@ def slots():
 
 ##### partners
 
-def crew(gold):
+def crew_recruitment(gold):
     display_crew()
     print()
-    print("You can choose a companion for your adventures! Each costs 150 gold! You can have maximum 3 companions. \n"
-           "Every companion increases the cost of moves by 15%. Press 'ENTER' to continue")
-    input()
+    print("You can choose a companion for your adventures! Each costs 150 gold! You can have maximum 3 companions.")
+    input("Every companion increases the cost of moves by 15%. Press 'ENTER' to continue")
+    print()
     print("Soldier: Whiskey gives + 20% Energy")
     print("Trader: 10% price bonus for selling and buying in villages")
     print("Donkey: Give +2 inventory slots without slowing you down")
-    print("Now you can choose from: ")
-    for i in crew:
-        print(i + ", ", end='')
-    X = input("Type the name of the companion you want to choose, or hit 'ENTER' if You want to continue alone.").lower()
-    for e_index, e in enumerate(crew):
-        if gold >= 150:
-            if X == e:
-                companions.append(e)
-                crew.pop(e_index)
-                gold -= 150
-                if X == "soldier":
-                    soldier()
-
-                elif X == "trader":
-                    # It has no separate def function. It's implemented in def F() at trading costs.
-                    pass
-
-                else: # Donkey
-                    donkey()
-
-                return gold
-            else:
-                gold -= 0
-                print("You can't choose that companion!")
-                input()
-                return gold
-        else:
-            gold -= 0
-            print("Not enough gold!")
-            input()
-            return gold
-
-
-def villagers(gold):
-    display_crew()
-    print()
-    print("You can choose a companion for your adventures! Each costs 150 gold! You can have maximum 3 companions. \n"
-           "Every companion increases the cost of moves by 15%. Press 'ENTER' to continue")
-    input()
     print("Wise: +3 reputation on new maps")
     print("Scout: +1 block vision distance")
     print("Shaman: Medicine gives +20% energy")
+    print()
+    print("Now you can choose from: ")
+    for i in crew:
+        print(i + ", ", end='')
+    print()
+    x = input(
+        "Type the name of the companion you want to choose, or hit 'ENTER' if You want to continue alone.").lower()
+    for e_index, e in enumerate(crew):
+        if x == e:
+            if gold >= 150:
+                companions.append(e)
+                crew.pop(e_index)
+                gold -= 150
+                if x == "soldier":
+                    soldier()
+
+                elif x == "trader":
+                    # It has no separate def function. It's implemented in def F() at trading costs.
+                    pass
+
+                else:  # Donkey
+                    donkey()
+                return gold
+
+            else:
+                gold -= 0
+                print("Not enough gold!")
+                input()
+                return gold
+            return gold
+
+    else:
+        gold -= 0
+        print("You can't choose that companion!")
+        input()
+        return gold
+
+
+def villager_recruitment(gold):
+    display_crew()
+    print()
+    print("You can choose a companion for your adventures! Each costs 150 gold! You can have maximum 3 companions.")
+    input("Every companion increases the cost of moves by 15%. Press 'ENTER' to continue")
+    print()
+    print("Soldier: Whiskey gives + 20% Energy")
+    print("Trader: 10% price bonus for selling and buying in villages")
+    print("Donkey: Give +2 inventory slots without slowing you down")
+    print("Wise: +3 reputation on new maps")
+    print("Scout: +1 block vision distance")
+    print("Shaman: Medicine gives +20% energy")
+    print()
     for i in crew:
         print("Now you can choose from: " + i)
-    X = input("Type the name of the companion you want to choose, or hit 'ENTER' if You want to continue alone.").lower()
+    print()
+    X = input(
+        "Type the name of the companion you want to choose, or hit 'ENTER' if You want to continue alone.").lower()
     for e_index, e in enumerate(villagers):
         if X == e:
             if gold >= 150:
@@ -808,12 +826,14 @@ def villagers(gold):
                 input()
                 return gold
 
+
 def soldier():
     if "whiskey" in inventory:
         inventory["whiskey"][2] = 24
 
     if "whiskey" in vendor:
         vendor["whiskey"][2] = 24
+
 
 def soldier_out():
     if "whiskey" in inventory:
@@ -822,27 +842,29 @@ def soldier_out():
     if "whiskey" in vendor:
         vendor["whiskey"][2] = 20
 
+
 def donkey():
     global allowed_slots
     allowed_slots += 2
+
 
 def donkey_out():
     global allowed_slots
     allowed_slots -= 2
 
+
 #############################################################################################
 
 
 def display_map(map, position):
-
     print(("\n") * 15)
     for row_index, row in enumerate(map):  # <- with the enumerate, I can print the indexes
         for column_index, column in enumerate(row):  # <- with the enumerate, I can print the indexes
 
             if row_index == position[0] and column_index == position[1]:  # If the array element = to our position
-                print('\x1b[5;31;43m' + column + " " + '\x1b[0m', end="") # Print the position with red and yellow
+                print('\x1b[5;31;43m' + column + " " + '\x1b[0m', end="")  # Print the position with red and yellow
 
-            else:                   # print the terrain types in different color
+            else:  # print the terrain types in different color
                 if column in "TVG":
                     print(colored(column + " ", "blue"), end="")
                 elif column in "SHB":
@@ -1041,6 +1063,7 @@ def move(position, map, current_energy, gold):
 
         elif moving == "b":
             current_energy = display_inventory(current_energy)
+            print(companions)
 
         for e in four_steps:
             if e + 4 == moves:
@@ -1053,6 +1076,7 @@ def move(position, map, current_energy, gold):
         print("gold: " + colored(str(gold), "yellow"))
 
 
+crew_recruitment(gold)
 display_map(map, position)
 print(" ~~ WELCOME TO THE PECULIAR EXPEDITION ~~ ")
 print("Above you can see the map. Your current location is always highlighted with yellow.")
