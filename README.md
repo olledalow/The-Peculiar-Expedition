@@ -28,7 +28,7 @@ Edit PATH and append ;C:\Python3 to the end (substitute your Python version).
 Click OK. Note that changes to the PATH are only reflected in command prompts opened after the change took place.
 
 NOTE: the game consists of 2 files: 
-GAME.py 					- includes the vast majority of the code
+GAME.py 					- includes the vast majority of the code   
 GAME_displays.py 	- includes the ASCII text art for visuals, and some character references
 
 
