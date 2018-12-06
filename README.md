@@ -17,22 +17,8 @@ move with 'w a s d': <'a' and hit enter>
 
 ## How to run
 
-on mac, linux:
-
-Option 1:   
-Call the interpreter: python3 filename.py  
-Option 2: Let the script call the interpreter:  
-Make sure the first line of your file has #!/usr/bin/env python.  
-Make it executable - chmod +x filename.py.  
-And run it as ./filename.py
-
-on windows:
-
-Exact steps for adding Python to the path on Windows 7+:  
-Computer -> System Properties (or Win+Break) -> Advanced System Settings.  
-Click the Environment variables... button (in the Advanced tab).  
-Edit PATH and append ;C:\Python3 to the end (substitute your Python version).  
-Click OK. Note that changes to the PATH are only reflected in command prompts opened after the change took place.  
+make the files executable with: chmod +x filename   
+Call the interpreter: python3 GAME.py  
 
 ## Note
 
