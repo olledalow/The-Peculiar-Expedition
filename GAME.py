@@ -62,20 +62,20 @@ map = [
     ["T", "T", "T", "T", ".", "J", "L", "L", ".", ".", "R", "O", ".", ".", "J", "J"]
 ]
 
-from asd import display_curse_geyser
-from asd import display_curse_volcano
-from asd import display_shrine_treasure
-from asd import display_shrine
-from asd import display_shrine_chest
-from asd import display_shrine_doll
-from asd import display_shrine_room
-from asd import display_shrine_runes
-from asd import display_shrine_door
-from asd import display_rest
-from asd import display_merchant
-from asd import display_village
-from asd import display_crew
-from asd import display_bag
+from GAME_displays import display_curse_geyser
+from GAME_displays import display_curse_volcano
+from GAME_displays import display_shrine_treasure
+from GAME_displays import display_shrine
+from GAME_displays import display_shrine_chest
+from GAME_displays import display_shrine_doll
+from GAME_displays import display_shrine_room
+from GAME_displays import display_shrine_runes
+from GAME_displays import display_shrine_door
+from GAME_displays import display_rest
+from GAME_displays import display_merchant
+from GAME_displays import display_village
+from GAME_displays import display_crew
+from GAME_displays import display_bag
 
 
 # ITEMS: NAME/AMOUNT/COST/ATTRIBUTE
@@ -110,13 +110,13 @@ def display_inventory(energy):
                         if energy + (inventory[e][2] * Y) > 100:
                             energy = 100
                             inventory[e][0] -= Y
-                            if inventory[e][0] - Y == 0:
+                            if inventory[e][0] == 0:
                                 inventory.pop(e, None)
 
                         else:
                             energy += (inventory[e][2] * Y)
                             inventory[e][0] -= Y
-                            if inventory[e][0] - Y == 0:
+                            if inventory[e][0] == 0:
                                 inventory.pop(e, None)
 
 
@@ -124,6 +124,7 @@ def display_inventory(energy):
                         print("You don't have that much...")
 
         else:
+            slots()
             energy -= 0
             return energy
 
@@ -135,7 +136,7 @@ def display_inventory(energy):
 
 def dot(energy):
     if (len(inventory)) > 8:
-        energy -= slots_cost
+        energy -= slots_cost * company_cost
         return energy
     else:
         energy -= 0
@@ -145,21 +146,21 @@ def dot(energy):
 ##### R
 
 def R(energy):
-    energy -= (EC * 1.4) * slots_cost
+    energy -= (EC * 1.4) * slots_cost * company_cost
     return energy
 
 
 ##### r
 
 def r(energy):
-    energy -= (EC * 2.1) * slots_cost
+    energy -= (EC * 2.1) * slots_cost * company_cost
     return energy
 
 
 ##### N
 
 def N(energy):
-    energy -= (EC * 1.8) * slots_cost
+    energy -= (EC * 1.8) * slots_cost * company_cost
     return energy
 
 
@@ -170,12 +171,16 @@ def J(energy):
         if inventory["machete"][0] >= 1:
             inventory["machete"][0] -= 1
             map[position[0]][position[1]] = "."
-            energy -= EC * slots_cost
+            energy -= EC * slots_cost * company_cost
             if inventory["machete"][0] == 0:
                 inventory.pop("machete", None)
+        company()
+        slots()
         return energy
     else:
-        energy -= (EC * 2) * slots_cost
+        energy -= (EC * 2) * slots_cost * company_cost
+        company()
+        slots()
         return energy
 
 
@@ -322,6 +327,7 @@ def F(gold, energy):
 
 
         else:
+            slots()
             gold -= 0
             return gold, energy
 
@@ -418,6 +424,7 @@ def O(energy):  # Function on Shrines.
                 input("'What have I done?' You are thinking... but It's too late for regrets now...")
                 four_steps.append(moves)
                 curse_Volcano(map)
+                slots()
                 return energy
             else:
                 display_curse_geyser()
@@ -425,15 +432,18 @@ def O(energy):  # Function on Shrines.
                 input("It turend into a geyser, spitting water everywhere in the area, making everything wet...")
                 input("'What have I done?' You are thinking... but It's too late for regrets now...")
                 curse_geyser()
+                slots()
                 return energy
         else:
             input("You run to the door, kick it in and run of the Shrine!")
             input("The fresh air filled your lungs, You looked down to your brand new treasure and thought:")
             input("Next time I might not be this lucky...")
+            slots()
             energy -= 0
             return energy
 
     else:
+        slots()
         energy -= 0
         return energy
 
@@ -465,11 +475,13 @@ def S(energy):
         if inventory["rope"][0] == 0:
             inventory.pop("rope", None)
         energy -= 0
+        slots()
         return energy
     else:
         bad_luck = random.randint(1, 101)
         if bad_luck <= 50:
             energy = catastrophe(energy)
+            slots()
             return energy
 
         elif bad_luck >= 51 and bad_luck <= 70:
@@ -478,14 +490,17 @@ def S(energy):
                 display_curse_geyser()
                 curse_geyser()
                 energy -= 0
+                slots()
                 return energy
             else:
                 four_steps.append(moves)
                 display_curse_volcano()
                 curse_Volcano(map)
                 energy -= 0
+                slots()
                 return energy
         else:
+            slots()
             energy -= 0
             return energy
 
@@ -515,14 +530,17 @@ def B(energy):
         if inventory["torch"][0] == 0:
             inventory.pop("torch", None)
         energy -= 0
+        slots()
         return energy
     else:
         catastrophe_chance = random.randint(1, 101)
         if catastrophe_chance <= 65:
             energy = catastrophe(energy)
+            slots()
             return energy
         else:
             energy -= 0
+            slots()
             return energy
 
 
@@ -750,6 +768,19 @@ def curse_geyser():
         elif map[W[0] + 1][W[1] - 2] == "F":
             map[W[0] + 1][W[1] - 2] = "f"
 
+##### company
+company_cost = 1
+
+def company():
+    global company_cost
+    if len(companions) > 0:
+        company_cost = (len(companions) * 0.15) + 1
+        return slots_cost
+    else:
+        company_cost = 1
+        return slots_cost
+
+
 
 ##### slots
 
@@ -763,7 +794,8 @@ def slots():
         slots_cost = ((len(inventory) - allowed_slots) * 0.2) + 1
         return slots_cost
     else:
-        return 1
+        slots_cost = 1
+        return slots_cost
 
 
 ##### partners
@@ -797,6 +829,7 @@ def crew_recruitment(gold):
 
                     else:  # Donkey
                         donkey()
+                    company()
                     return gold
 
                 else:
@@ -843,7 +876,7 @@ def villager_recruitment(gold):
 
                     else:
                         pass
-
+                    company()
                     return gold
 
                 else:
@@ -1126,6 +1159,7 @@ def move(position, map, current_energy, gold):
         print("     min _________________________ max")
         print("energy: |" + colored(str(int(current_energy / 4) * u"\u25A0"), "green") + str(int(current_energy)))
         print("gold: " + colored(str(gold), "yellow"))
+
 
 
 gold = crew_recruitment(gold)
