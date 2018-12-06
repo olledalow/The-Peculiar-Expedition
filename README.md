@@ -1,4 +1,4 @@
-THE PECULIAR EXPEDITION:   
+#THE PECULIAR EXPEDITION:   
 This is going to be an adventure game, where you can explore islands, collect treasures, trade with villagers, and so on.
 The goal is to find the Golden Pyramid on each map.
 
