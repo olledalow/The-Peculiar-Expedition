@@ -23,9 +23,21 @@ vendor = {
     "torch": [2, 40, 0]
 }
 
-companions = []
-crew = ["trader", "soldier", "donkey"]
-villagers = ["scout", "Shaman", "wise", ]
+companions = {
+
+}
+
+crew = {
+    "trader": "- 10% price bonus for trading",
+    "soldier": "- Whiskey gives + 20% Energy",
+    "donkey": "- +2 inventory slots"
+}
+
+villagers = {
+    "scout": "  +1 vision",
+    "shaman": "- Medicine gives +20% energy",
+    "wise": "- +3 reputation on new maps"
+}
 
 import time
 from termcolor import colored
@@ -63,11 +75,19 @@ from asd import display_rest
 from asd import display_merchant
 from asd import display_village
 from asd import display_crew
+from asd import display_bag
 
 
 # ITEMS: NAME/AMOUNT/COST/ATTRIBUTE
 
 def display_inventory(energy):
+    display_bag()
+    if len(inventory) > allowed_slots:
+        print(str(len(inventory)) + " out of " + str(allowed_slots) + ". You are carrying" +
+              str(len(inventory) - allowed_slots) + "extra items in your hand.")
+    else:
+        print(str(len(inventory)) + " out of " + str(allowed_slots) + ". You have " +
+              str(allowed_slots - len(inventory)) + " free slots left.")
     for e in inventory:
         if inventory[e][0] != 0:
             print(e, inventory[e][0])  # print inventory elements if have any of it.
@@ -78,10 +98,12 @@ def display_inventory(energy):
 
         if "soldier" in companions:
             print("Because you have a Soldier companion, you get extra 20% energy when drinking whiskey")
+        if "shaman" in companions:
+            print("Because you have a Shaman companion, you get extra 20% energy when using medicine")
 
         X = input("choose food or drink to consume for energy or press 'ENTER' to exit: \n")
         if X == "fruit" or X == "whiskey" or X == "medicine" or X == "chocolate" or X == "meat":
-            for e in inventory:
+            for e in list(inventory):
                 if X == e:
                     Y = int(input("How many would you like to eat or drink? "))
                     if inventory[e][0] - Y > -1:
@@ -102,6 +124,7 @@ def display_inventory(energy):
                         print("You don't have that much...")
 
         else:
+            energy -= 0
             return energy
 
 
@@ -143,12 +166,13 @@ def N(energy):
 ##### J
 
 def J(energy):
-    if inventory["machete"][0] >= 1:
-        inventory["machete"][0] -= 1
-        if inventory["machete"][0] == 0:
-            inventory.pop("machete", None)
-        energy -= EC * slots_cost
-        map[position[0]][position[1]] = "."
+    if "machete" in inventory:
+        if inventory["machete"][0] >= 1:
+            inventory["machete"][0] -= 1
+            map[position[0]][position[1]] = "."
+            energy -= EC * slots_cost
+            if inventory["machete"][0] == 0:
+                inventory.pop("machete", None)
         return energy
     else:
         energy -= (EC * 2) * slots_cost
@@ -158,6 +182,10 @@ def J(energy):
 ##### F
 
 def F(gold, energy):
+    villager_chance = random.randint(1, 101)
+    if villager_chance <= 99:
+        gold = villager_recruitment(gold)
+
     while True:
 
         display_village()
@@ -186,6 +214,8 @@ def F(gold, energy):
                     if inventory[e][0] != 0:
                         print(e, inventory[e][0], inventory[e][1])
             print("My gold: " + colored(str(gold), "yellow"))
+            if "trader" in companions:
+                print("Because You have a Trader companion, You can sell your stuff for more gold, and buy cheaper!")
 
             while True:
                 b_s = input("Enter 'b' to buy, 's' to sell, 'i' to check inventory, 'ENTER' to exit: ")
@@ -208,7 +238,7 @@ def F(gold, energy):
                         if X in inventory:
                             inventory[X][0] += Y
                             inventory[X][1] = vendor[X][1]
-                            inventory[X].append(vendor[X][2])
+                            inventory[X][2] = vendor[X][2]
                             print("My gold: " + colored(str(gold), "yellow"))
 
                         else:
@@ -740,91 +770,91 @@ def slots():
 
 def crew_recruitment(gold):
     display_crew()
-    print()
-    print("You can choose a companion for your adventures! Each costs 150 gold! You can have maximum 3 companions.")
-    input("Every companion increases the cost of moves by 15%. Press 'ENTER' to continue")
-    print()
-    print("Soldier: Whiskey gives + 20% Energy")
-    print("Trader: 10% price bonus for selling and buying in villages")
-    print("Donkey: Give +2 inventory slots without slowing you down")
-    print("Wise: +3 reputation on new maps")
-    print("Scout: +1 block vision distance")
-    print("Shaman: Medicine gives +20% energy")
-    print()
-    print("Now you can choose from: ")
+    print("\n"
+          "You can choose a companion for your adventures! Each costs 150 gold! You can have maximum 3 companions.")
+
+    print("Every companion increases the cost of moves by 15%. Press 'ENTER' to continue \n")
+    input("Press 'ENTER' to see the crew!")
     for i in crew:
-        print(i + ", ", end='')
+        print(i, crew[i])
     print()
-    x = input(
-        "Type the name of the companion you want to choose, or hit 'ENTER' if You want to continue alone.").lower()
-    for e_index, e in enumerate(crew):
-        if x == e:
-            if gold >= 150:
-                companions.append(e)
-                crew.pop(e_index)
-                gold -= 150
-                if x == "soldier":
-                    soldier()
 
-                elif x == "trader":
-                    # It has no separate def function. It's implemented in def F() at trading costs.
-                    pass
+    while True:
+        x = input(
+            "Type the name of the companion you want to choose, or type 'Q' if You want to continue alone.").lower()
+        for e in crew:
+            if x == e:
+                if gold >= 150 and len(companions) < 3:
+                    companions[e] = crew[e]
+                    crew.pop(e, None)
+                    gold -= 150
+                    if x == "soldier":
+                        soldier()
 
-                else:  # Donkey
-                    donkey()
-                return gold
+                    elif x == "trader":
+                        # It has no separate def function. It's implemented in def F() at trading costs.
+                        pass
 
-            else:
-                gold -= 0
-                print("Not enough gold!")
-                input()
-                return gold
+                    else:  # Donkey
+                        donkey()
+                    return gold
+
+                else:
+                    gold -= 0
+                    print("Not enough gold!")
+                    input()
+                    return gold
+
+        if x == "q":
+            gold -= 0
             return gold
-
-    else:
-        gold -= 0
-        print("You can't choose that companion!")
-        input()
-        return gold
 
 
 def villager_recruitment(gold):
     display_crew()
+    print("\n"
+          "WOW! YOUR REPUTATION PRECEDES YOU! \n"
+          "Local villagers offer their help to you for a little gold! \n"
+          "Each costs 150 gold! You can have maximum 3 companions.")
+
+    print("Every companion increases the cost of moves by 15%. Press 'ENTER' to continue \n"
+          "Now You can choose from:")
+    input("Press 'ENTER' to see the villagers: ")
+
+    for i in villagers:
+        print(i, villagers[i])
+
     print()
-    print("You can choose a companion for your adventures! Each costs 150 gold! You can have maximum 3 companions.")
-    input("Every companion increases the cost of moves by 15%. Press 'ENTER' to continue")
-    print()
-    print("Soldier: Whiskey gives + 20% Energy")
-    print("Trader: 10% price bonus for selling and buying in villages")
-    print("Donkey: Give +2 inventory slots without slowing you down")
-    print("Wise: +3 reputation on new maps")
-    print("Scout: +1 block vision distance")
-    print("Shaman: Medicine gives +20% energy")
-    print()
-    for i in crew:
-        print("Now you can choose from: " + i)
-    print()
-    X = input(
-        "Type the name of the companion you want to choose, or hit 'ENTER' if You want to continue alone.").lower()
-    for e_index, e in enumerate(villagers):
-        if X == e:
-            if gold >= 150:
-                if X == e:
-                    companions.append(e)
-                    villagers.pop(e_index)
+
+    while True:
+        x = input(
+            "Type the name of the companion you want to choose, or type 'Q' if You want to continue alone.").lower()
+        for e in villagers:
+            if x == e:
+                if gold >= 150 and len(companions) < 3:
+                    companions[e] = villagers[e]
+                    villagers.pop(e, None)
                     gold -= 150
-                    if X == "soldier":
+                    if x == "wise":
                         pass
-                    elif X == "trader":
-                        pass
+
+                    elif x == "shaman":
+                        shaman()
+
                     else:
                         pass
-                        return gold
-            else:
-                gold -= 0
-                print("Not enough gold!")
-                input()
-                return gold
+
+                    return gold
+
+                else:
+                    gold -= 0
+                    print("Not enough gold!")
+                    input()
+                    return gold
+
+        if x == "q":
+            gold -= 0
+            return gold
 
 
 def soldier():
@@ -841,6 +871,22 @@ def soldier_out():
 
     if "whiskey" in vendor:
         vendor["whiskey"][2] = 20
+
+
+def shaman():
+    if "medicine" in inventory:
+        inventory["medicine"][2] = 24
+
+    if "medicine" in vendor:
+        vendor["medicine"][2] = 24
+
+
+def shaman_out():
+    if "medicine" in inventory:
+        inventory["medicine"][2] = 20
+
+    if "medicine" in vendor:
+        vendor["medicine"][2] = 20
 
 
 def donkey():
@@ -886,7 +932,7 @@ def move(position, map, current_energy, gold):
     global moves
     while current_energy > 0:
 
-        moving = input("move with 'w a s d' or check your bag with 'b' ")
+        moving = input("move with 'w a s d', check your bag with 'b', see your companions with 'c'. ")
         if len(inventory) > 8:
             slots()
 
@@ -1063,7 +1109,13 @@ def move(position, map, current_energy, gold):
 
         elif moving == "b":
             current_energy = display_inventory(current_energy)
-            print(companions)
+        elif moving == "c":
+            if len(companions) > 0:
+                for e in companions:
+                    print(e, companions[e])
+                    input("")
+            else:
+                input("You have no companions!")
 
         for e in four_steps:
             if e + 4 == moves:
@@ -1076,7 +1128,7 @@ def move(position, map, current_energy, gold):
         print("gold: " + colored(str(gold), "yellow"))
 
 
-crew_recruitment(gold)
+gold = crew_recruitment(gold)
 display_map(map, position)
 print(" ~~ WELCOME TO THE PECULIAR EXPEDITION ~~ ")
 print("Above you can see the map. Your current location is always highlighted with yellow.")
