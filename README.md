@@ -22,6 +22,7 @@ Call the interpreter: python3 GAME.py
 
 ## Note
 
+The game is in an early stage, It's still under development.
 The game consists of 2 files:  
 GAME.py - includes the vast majority of the code  
 GAME_displays.py - includes the ASCII text art for visuals, and some character references  
