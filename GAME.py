@@ -1,15 +1,14 @@
 current_energy = 100  # displayed as u"\u25A0" bar
 EC = 3  # game difficulty. minimal energy cost for a move.
-gold = 250
+gold = 1000
 position = [3, 5]  # actual position on the map
 moves = 0  # number of moves the player made in the game
 
 # ITEMS: NAME/AMOUNT/COST/ATTRIBUTE
 inventory = {
-    "rope": [2, 40, 0],
-    "machete": [2, 40, 0],
-    "torch": [1, 40, 0],
-    "glassball": [2, 100, 0],
+    "rope": [1, 40, 0],
+    "machete": [1, 40, 0],
+    "glassball": [1, 100, 0],
     "whiskey": [1, 50, 20],
 }
 # ITEMS: NAME/AMOUNT/COST/ATTRIBUTE
@@ -135,8 +134,14 @@ def display_inventory(energy):
 ##### .
 
 def dot(energy):
-    if (len(inventory)) > 8:
+    if len(companions) != 0 and len(inventory) > 8:
         energy -= slots_cost * company_cost
+        return energy
+    if len(companions) != 0:
+        energy -= company_cost
+        return energy
+    if len(inventory) > 8:
+        energy -= slots_cost
         return energy
     else:
         energy -= 0
@@ -188,7 +193,7 @@ def J(energy):
 
 def F(gold, energy):
     villager_chance = random.randint(1, 101)
-    if villager_chance <= 99:
+    if villager_chance <= 100:
         gold = villager_recruitment(gold)
 
     while True:
@@ -525,7 +530,8 @@ def B(energy):
     else:
         inventory["treasure"] = [1, 100, 0]
 
-    if inventory["torch"][0] >= 1:
+
+    if "torch" in inventory:
         inventory["torch"][0] -= 1
         if inventory["torch"][0] == 0:
             inventory.pop("torch", None)
@@ -535,6 +541,7 @@ def B(energy):
     else:
         catastrophe_chance = random.randint(1, 101)
         if catastrophe_chance <= 65:
+            input('CATASTROOOPHE')  # not here
             energy = catastrophe(energy)
             slots()
             return energy
@@ -552,13 +559,61 @@ def B(energy):
 ##### catastrophe
 
 def catastrophe(energy):
+    global injured
+
     X = random.randint(1, 101)
+
     if X <= 70:
         energy -= 45
         return energy
+
+    elif X > 70 and X <= 80:
+        if len(companions) != 0:
+            injured = True # global variable set true. -> In moves function we call the injury function.
+            Y = random.choice(list(companions))
+            injured_list[Y] = 0
+            input("Oh no! Your " + Y + " companion got injured... There is a chance he can't keep up in the future...")
+            energy -= 0
+            pass
+
     else:
-        energy -= 0
-        return energy
+        if len(companions) != 0:
+            traitor()
+            energy -= 0
+            return energy
+    energy -= 0
+    return energy
+
+
+injured_list = {}
+injured = False
+
+
+def traitor():
+    Y = random.choice(list(companions))
+    Z = random.choice(list(inventory))
+    if Z == "treasure":
+        input("Your " + Y + " companion betrayed you! He took the " + Z + " and run away with it...")
+    else:
+        input("Your " + Y + " companion betrayed you! He left your group and stole 1 " + Z + " from you backpack...")
+    companions.pop(Y, None)
+    inventory[Z][0] -= 1
+    if inventory[Z][0] == 0:
+        inventory.pop(Z, None)
+
+
+def injury():
+    global injured
+    X = random.randint(1, 101)
+    if X <= 5:
+        Y = random.choice(list(injured_list))
+        input("Your " + Y + " companion got enough of your journeys! He leaves the group because of his injuries.")
+        companions.pop(Y, None)
+        injured_list.pop(Y, None)
+        if len(injured_list) != 0:
+            pass
+        else:
+            injured = False
 
 
 ##### volcano
@@ -768,8 +823,10 @@ def curse_geyser():
         elif map[W[0] + 1][W[1] - 2] == "F":
             map[W[0] + 1][W[1] - 2] = "f"
 
+
 ##### company
 company_cost = 1
+
 
 def company():
     global company_cost
@@ -779,7 +836,6 @@ def company():
     else:
         company_cost = 1
         return slots_cost
-
 
 
 ##### slots
@@ -806,6 +862,10 @@ def crew_recruitment(gold):
           "You can choose a companion for your adventures! Each costs 150 gold! You can have maximum 3 companions.")
 
     print("Every companion increases the cost of moves by 15%. Press 'ENTER' to continue \n")
+    if len(companions) == 3:
+        input("You already have 3 companions. You can't have more!")
+        gold -= 0
+        return gold
     input("Press 'ENTER' to see the crew!")
     for i in crew:
         print(i, crew[i])
@@ -852,6 +912,10 @@ def villager_recruitment(gold):
 
     print("Every companion increases the cost of moves by 15%. Press 'ENTER' to continue \n"
           "Now You can choose from:")
+    if len(companions) == 3:
+        input("You already have 3 companions. You can't have more!")
+        gold -= 0
+        return gold
     input("Press 'ENTER' to see the villagers: ")
 
     for i in villagers:
@@ -936,7 +1000,7 @@ def donkey_out():
 
 
 def display_map(map, position):
-    print(("\n") * 15)
+    print(("\n") * 20)
     for row_index, row in enumerate(map):  # <- with the enumerate, I can print the indexes
         for column_index, column in enumerate(row):  # <- with the enumerate, I can print the indexes
 
@@ -962,7 +1026,7 @@ def display_map(map, position):
 
 
 def move(position, map, current_energy, gold):
-    global moves
+    global moves, injured
     while current_energy > 0:
 
         moving = input("move with 'w a s d', check your bag with 'b', see your companions with 'c'. ")
@@ -1146,7 +1210,7 @@ def move(position, map, current_energy, gold):
             if len(companions) > 0:
                 for e in companions:
                     print(e, companions[e])
-                    input("")
+                input("")
             else:
                 input("You have no companions!")
 
@@ -1155,11 +1219,13 @@ def move(position, map, current_energy, gold):
                 # function to change back the L to terrain
                 volcano_back()
 
+        if injured:
+            injury()
+
         display_map(map, position)
         print("     min _________________________ max")
         print("energy: |" + colored(str(int(current_energy / 4) * u"\u25A0"), "green") + str(int(current_energy)))
         print("gold: " + colored(str(gold), "yellow"))
-
 
 
 gold = crew_recruitment(gold)
