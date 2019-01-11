@@ -1,7 +1,31 @@
+import time
+from termcolor import colored
+import random
+
+
+from random_map_generator import map
+from random_map_generator import position
+
+
+from GAME_displays import display_curse_geyser
+from GAME_displays import display_curse_volcano
+from GAME_displays import display_shrine_treasure
+from GAME_displays import display_shrine
+from GAME_displays import display_shrine_chest
+from GAME_displays import display_shrine_doll
+from GAME_displays import display_shrine_room
+from GAME_displays import display_shrine_runes
+from GAME_displays import display_shrine_door
+from GAME_displays import display_rest
+from GAME_displays import display_merchant
+from GAME_displays import display_village
+from GAME_displays import display_crew
+from GAME_displays import display_bag
+
 current_energy = 100  # displayed as u"\u25A0" bar
 EC = 3  # game difficulty. minimal energy cost for a move.
 gold = 1000
-position = [3, 5]  # actual position on the map
+#position = [3, 5]  # actual position on the map
 moves = 0  # number of moves the player made in the game
 
 # ITEMS: NAME/AMOUNT/COST/ATTRIBUTE
@@ -38,48 +62,34 @@ villagers = {
     "wise": "- +3 reputation on new maps"
 }
 
-import time
-from termcolor import colored
-import random
 
-map = [
-    ["T", "T", "T", "T", "T", "T", "F", "R", "R", "H", "O", ".", ".", "N", "V", "V"],
-    ["T", "T", "T", "T", "T", "T", "T", "J", "J", "H", ".", "R", "R", "r", "r", "N"],
-    ["T", "T", "T", "T", "T", "T", ".", "J", ".", "H", "H", "N", "r", "R", "R", "H"],
-    ["T", "T", "T", "T", "T", "C", ".", ".", "B", "H", "H", "V", "N", "N", "H", "H"],
-    ["T", "T", "T", "T", "T", "T", "T", ".", "N", "N", "V", "V", "V", "J", ".", "S"],
-    ["T", "T", "T", "T", "T", "R", ".", "R", "J", "J", "V", "r", "r", "r", ".", "L"],
-    ["T", "T", "T", "J", "J", ".", "R", "J", "J", "O", "N", "N", "R", ".", ".", "J"],
-    ["T", "T", "T", "T", "R", "R", "R", ".", ".", ".", ".", "V", "H", "P", "J", "."],
-    ["T", "T", "T", "T", "T", "H", "J", "F", ".", "R", "H", "B", ".", "H", "J", "H"],
-    ["T", "T", "T", "T", "T", "T", "H", ".", "L", "R", ".", ".", "R", "R", "B", "S"],
-    ["T", "T", "T", "T", "T", "T", "S", ".", "J", "R", "J", "H", ".", "R", "R", "."],
-    ["T", "T", "T", "T", "T", ".", ".", "R", ".", "J", ".", "H", "H", ".", ".", "."],
-    [".", "T", "R", ".", "R", "R", "R", "R", ".", "N", "N", "N", "H", "H", "H", "H"],
-    ["H", "T", "R", "H", ".", ".", "H", "J", ".", "r", "V", "f", ".", "B", "H", "."],
-    ["T", "T", "T", ".", "J", "J", "B", "H", ".", "r", "N", "N", "R", "J", "J", "J"],
-    ["T", "T", "T", "T", ".", "J", "L", "L", ".", ".", "R", "O", ".", ".", "J", "J"]
-]
+# map = [
+#     ["T", "T", "T", "T", "T", "T", "F", "R", "R", "H", "O", ".", ".", "N", "V", "V"],
+#     ["T", "T", "T", "T", "T", "T", "T", "J", "J", "H", ".", "R", "R", "r", "r", "N"],
+#     ["T", "T", "T", "T", "T", "T", ".", "J", ".", "H", "H", "N", "r", "R", "R", "H"],
+#     ["T", "T", "T", "T", "T", "C", ".", ".", "B", "H", "H", "V", "N", "N", "H", "H"],
+#     ["T", "T", "T", "T", "T", "T", "T", ".", "N", "N", "V", "V", "V", "J", ".", "S"],
+#     ["T", "T", "T", "T", "T", "R", ".", "R", "J", "J", "V", "r", "r", "r", ".", "L"],
+#     ["T", "T", "T", "J", "J", ".", "R", "J", "J", "O", "N", "N", "R", ".", ".", "J"],
+#     ["T", "T", "T", "T", "R", "R", "R", ".", ".", ".", ".", "V", "H", "P", "J", "."],
+#     ["T", "T", "T", "T", "T", "H", "J", "F", ".", "R", "H", "B", ".", "H", "J", "H"],
+#     ["T", "T", "T", "T", "T", "T", "H", ".", "L", "R", ".", ".", "R", "R", "B", "S"],
+#     ["T", "T", "T", "T", "T", "T", "S", ".", "J", "R", "J", "H", ".", "R", "R", "."],
+#     ["T", "T", "T", "T", "T", ".", ".", "R", ".", "J", ".", "H", "H", ".", ".", "."],
+#     [".", "T", "R", ".", "R", "R", "R", "R", ".", "N", "N", "N", "H", "H", "H", "H"],
+#     ["H", "T", "R", "H", ".", ".", "H", "J", ".", "r", "V", "f", ".", "B", "H", "."],
+#     ["T", "T", "T", ".", "J", "J", "B", "H", ".", "r", "N", "N", "R", "J", "J", "J"],
+#     ["T", "T", "T", "T", ".", "J", "L", "L", ".", ".", "R", "O", ".", ".", "J", "J"]
+# ]
 
-from GAME_displays import display_curse_geyser
-from GAME_displays import display_curse_volcano
-from GAME_displays import display_shrine_treasure
-from GAME_displays import display_shrine
-from GAME_displays import display_shrine_chest
-from GAME_displays import display_shrine_doll
-from GAME_displays import display_shrine_room
-from GAME_displays import display_shrine_runes
-from GAME_displays import display_shrine_door
-from GAME_displays import display_rest
-from GAME_displays import display_merchant
-from GAME_displays import display_village
-from GAME_displays import display_crew
-from GAME_displays import display_bag
+
 
 
 # ITEMS: NAME/AMOUNT/COST/ATTRIBUTE
 
 def display_inventory(energy):
+    # display inventory, shows free slots or excess item number, prints energy bar,
+    # allow the player to consume food or drink to restore energy
     display_bag()
     if len(inventory) > allowed_slots:
         print(str(len(inventory)) + " out of " + str(allowed_slots) + ". You are carrying" +
@@ -118,7 +128,6 @@ def display_inventory(energy):
                             if inventory[e][0] == 0:
                                 inventory.pop(e, None)
 
-
                     else:
                         print("You don't have that much...")
 
@@ -131,9 +140,10 @@ def display_inventory(energy):
 #############################################################################################
 # TERRAIN TYPES
 
-##### .
 
 def dot(energy):
+    # only burns energy to move on it if there are more items in the inventory than allowed,
+    # or when traveling with companions
     if len(companions) != 0 and len(inventory) > 8:
         energy -= slots_cost * company_cost
         return energy
@@ -148,30 +158,26 @@ def dot(energy):
         return energy
 
 
-##### R
-
 def R(energy):
+    # burns energy
     energy -= (EC * 1.4) * slots_cost * company_cost
     return energy
 
 
-##### r
-
 def r(energy):
+    # wet thickets: burns more energy than simple thicket
     energy -= (EC * 2.1) * slots_cost * company_cost
     return energy
 
 
-##### N
-
 def N(energy):
+    # Wet ground: burns more energy
     energy -= (EC * 1.8) * slots_cost * company_cost
     return energy
 
 
-##### J
-
 def J(energy):
+    # Jungle: use up a machete to turn it to plain ground. Else it burns more energy.
     if "machete" in inventory:
         if inventory["machete"][0] >= 1:
             inventory["machete"][0] -= 1
@@ -179,19 +185,16 @@ def J(energy):
             energy -= EC * slots_cost * company_cost
             if inventory["machete"][0] == 0:
                 inventory.pop("machete", None)
-        company()
         slots()
         return energy
     else:
         energy -= (EC * 2) * slots_cost * company_cost
-        company()
         slots()
         return energy
 
 
-##### F
-
 def F(gold, energy):
+    # Village: chance to recruit villagers as companions, sell and buy items at vendor, rest for restoring energy
     villager_chance = random.randint(1, 101)
     if villager_chance <= 100:
         gold = villager_recruitment(gold)
@@ -205,19 +208,19 @@ def F(gold, energy):
 
             print("ITEM, AMOUNT, COST")
             for e in vendor:
-                if "trader" in companions:
+                if "trader" in companions:  # if player has trader companion, prices are 10% lower.
                     if vendor[e][0] != 0:
                         print(e, vendor[e][0],
                               str(int(vendor[e][1] * 0.9)))
                 else:
                     if vendor[e][0] != 0:
                         print(e, vendor[e][0],
-                              vendor[e][1])  # print the key (item name), 1. value (amount), 2. value (price)
+                              vendor[e][1])
 
             print()
             print("My inventory:")
             for e in inventory:
-                if "trader" in companions:
+                if "trader" in companions:  # if player has trader companion, items can be sold for 10% extra gold
                     if inventory[e][0] != 0:
                         print(e, inventory[e][0], str(int(inventory[e][1] * 1.1)))
                 else:
@@ -225,7 +228,7 @@ def F(gold, energy):
                         print(e, inventory[e][0], inventory[e][1])
             print("My gold: " + colored(str(gold), "yellow"))
             if "trader" in companions:
-                print("Because You have a Trader companion, You can sell your stuff for more gold, and buy cheaper!")
+                print("Because You have a Trader companion, You make better deals!")
 
             while True:
                 b_s = input("Enter 'b' to buy, 's' to sell, 'i' to check inventory, 'ENTER' to exit: ")
@@ -337,12 +340,11 @@ def F(gold, energy):
             return gold, energy
 
 
-##### O
-
 four_steps = []  # saves the current moves number for later use (after 4 steps its used)
 
 
-def O(energy):  # Function on Shrines.
+def O(energy):
+    # Shrine: lootable treasure, 80% chance on catastrophe
     display_shrine()
     global four_steps
 
@@ -427,9 +429,9 @@ def O(energy):  # Function on Shrines.
                 input("It turned into a Volcano!")
                 input("bright red and yellow Lava is flowing out of it, burning everything down in its way...")
                 input("'What have I done?' You are thinking... but It's too late for regrets now...")
-                four_steps.append(moves)
+                four_steps.append(moves)  # save current move number, so after 4 steps it can be used again.
                 curse_Volcano(map)
-                slots()
+                slots()  # to check the item number (because of 1 plus treasure)
                 return energy
             else:
                 display_curse_geyser()
@@ -437,7 +439,7 @@ def O(energy):  # Function on Shrines.
                 input("It turend into a geyser, spitting water everywhere in the area, making everything wet...")
                 input("'What have I done?' You are thinking... but It's too late for regrets now...")
                 curse_geyser()
-                slots()
+                slots()  # to check the item number (because of 1 plus treasure)
                 return energy
         else:
             input("You run to the door, kick it in and run of the Shrine!")
@@ -453,12 +455,11 @@ def O(energy):  # Function on Shrines.
         return energy
 
 
-##### S
-
-S_coordinate = []
+S_coordinate = []  # contains the coordinates of already visited Shrines
 
 
 def S(energy):
+    # Sanctuary: lootable treasure, if rope in inventory its harmless, else 50% chance on catastrophe and 20 on curse
     global four_steps
 
     for e in S_coordinate:
@@ -475,7 +476,7 @@ def S(energy):
     else:
         inventory["treasure"] = [1, 100, 0]
 
-    if inventory["rope"][0] >= 1:
+    if "rope" in inventory:
         inventory["rope"][0] -= 1
         if inventory["rope"][0] == 0:
             inventory.pop("rope", None)
@@ -510,12 +511,11 @@ def S(energy):
             return energy
 
 
-##### B
-
 B_coordinate = []
 
 
 def B(energy):
+    # lootable treasure, if torch in inventory its harmless, else 65% chance on catastrophe
     for e in B_coordinate:
         if position == e:
             input("You have already been in this Cave...")
@@ -529,7 +529,6 @@ def B(energy):
         inventory["treasure"][0] += 1
     else:
         inventory["treasure"] = [1, 100, 0]
-
 
     if "torch" in inventory:
         inventory["torch"][0] -= 1
@@ -556,9 +555,8 @@ def B(energy):
 
 # INTERACTIVES
 
-##### catastrophe
-
 def catastrophe(energy):
+    # 70% chance on 45 energy loss, 10% chance on injury, 20% that a companion immedietly leaves the group (traitor).
     global injured
 
     X = random.randint(1, 101)
@@ -590,6 +588,7 @@ injured = False
 
 
 def traitor():
+    # a companion leaves the group and steals an item from inventory
     Y = random.choice(list(companions))
     Z = random.choice(list(inventory))
     if Z == "treasure":
@@ -603,6 +602,7 @@ def traitor():
 
 
 def injury():
+    # 5% chance on every move that a companion leaves the group.
     global injured
     X = random.randint(1, 101)
     if X <= 5:
@@ -616,14 +616,13 @@ def injury():
             injured = False
 
 
-##### volcano
-
 O_coordinate = []  # coordinates of the Shrine we are currently in.
 L_coordinate = []  # types and coordinates of terrains that are being changed to L
 Volcano_coordinate = []  # coordinates of H-s being changed to @ (volcanos)
 
 
 def curse_Volcano(map):
+    # turn the closest mountain to volcano, and the neighbour terrains to lava
     H_coordinates = []  # Actual coordinates of H-s, like : [3, 5]
     steps = []  # Number of steps between position and H, like: 5
 
@@ -672,15 +671,15 @@ def curse_Volcano(map):
 
 
 def volcano_back():
+    # turn back the lava terrain to plain ground
     for e in L_coordinate:
         map[e[1]][e[2]] = "."
 
 
-##### geyser
-
 def curse_geyser():
-    Water_coordinates = []  # Actual coordinates of V-s, like : [3, 5]
-    steps = []  # Number of steps between position and V, like: 5
+    # turns lakes into geysers, and turns neighboring terrain wet.
+    Water_coordinates = []  # Actual coordinates of V-s, las list coordinates [x,y]
+    steps = []  # Number of steps between position and V, as int
 
     for row_index, row in enumerate(map):  # <- with the enumerate, I can get the indexes
         for column_index, column in enumerate(row):  # <- with the enumerate, I can get the indexes
@@ -824,11 +823,11 @@ def curse_geyser():
             map[W[0] + 1][W[1] - 2] = "f"
 
 
-##### company
 company_cost = 1
 
 
 def company():
+    # if player has companions, the energy cost of moves increases by 15%
     global company_cost
     if len(companions) > 0:
         company_cost = (len(companions) * 0.15) + 1
@@ -838,13 +837,12 @@ def company():
         return slots_cost
 
 
-##### slots
-
 slots_cost = 1
 allowed_slots = 8
 
 
 def slots():
+    # If there is more items in inventory than allowed, moves cost more energy.
     global slots_cost
     if len(inventory) > allowed_slots:
         slots_cost = ((len(inventory) - allowed_slots) * 0.2) + 1
@@ -854,9 +852,8 @@ def slots():
         return slots_cost
 
 
-##### partners
-
 def crew_recruitment(gold):
+    # Player can choose a companion for 150 gold
     display_crew()
     print("\n"
           "You can choose a companion for your adventures! Each costs 150 gold! You can have maximum 3 companions.")
@@ -904,13 +901,14 @@ def crew_recruitment(gold):
 
 
 def villager_recruitment(gold):
+    # Player can choose a companion for 150 gold
     display_crew()
     print("\n"
           "WOW! YOUR REPUTATION PRECEDES YOU! \n"
           "Local villagers offer their help to you for a little gold! \n"
           "Each costs 150 gold! You can have maximum 3 companions.")
 
-    print("Every companion increases the cost of moves by 15%. Press 'ENTER' to continue \n"
+    print("Every companion increases the cost of moves by 15%. \n"
           "Now You can choose from:")
     if len(companions) == 3:
         input("You already have 3 companions. You can't have more!")
@@ -955,6 +953,7 @@ def villager_recruitment(gold):
 
 
 def soldier():
+    # If soldier chosen as companion, set the energy bonus on whiskey higher
     if "whiskey" in inventory:
         inventory["whiskey"][2] = 24
 
@@ -963,6 +962,7 @@ def soldier():
 
 
 def soldier_out():
+    # If soldier leaves the group, change back whiskey energy cost to original
     if "whiskey" in inventory:
         inventory["whiskey"][2] = 20
 
@@ -971,6 +971,7 @@ def soldier_out():
 
 
 def shaman():
+    # If soldier chosen as companion, set the energy bonus on medicine higher
     if "medicine" in inventory:
         inventory["medicine"][2] = 24
 
@@ -979,6 +980,7 @@ def shaman():
 
 
 def shaman_out():
+    # If soldier leaves the group, change back medicine energy cost to original
     if "medicine" in inventory:
         inventory["medicine"][2] = 20
 
@@ -987,11 +989,13 @@ def shaman_out():
 
 
 def donkey():
+    # If donkey chosen as companion, increase inventory slots
     global allowed_slots
     allowed_slots += 2
 
 
 def donkey_out():
+    # If donkey leaves the group, change back inventory slots to original
     global allowed_slots
     allowed_slots -= 2
 
@@ -1000,7 +1004,8 @@ def donkey_out():
 
 
 def display_map(map, position):
-    print(("\n") * 20)
+    # Displays the map with the current location after every move
+    print(("\n") * 30)
     for row_index, row in enumerate(map):  # <- with the enumerate, I can print the indexes
         for column_index, column in enumerate(row):  # <- with the enumerate, I can print the indexes
 
@@ -1226,6 +1231,7 @@ def move(position, map, current_energy, gold):
         print("     min _________________________ max")
         print("energy: |" + colored(str(int(current_energy / 4) * u"\u25A0"), "green") + str(int(current_energy)))
         print("gold: " + colored(str(gold), "yellow"))
+
 
 
 gold = crew_recruitment(gold)
