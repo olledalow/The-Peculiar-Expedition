@@ -1,20 +1,19 @@
 '''
-T = Tenger
-V = viz
-H = Hegy
-B = Barlang
-O = Oltar
+    T = Tenger
+    V = viz
+    H = Hegy
+    B = Barlang
+    O = Oltar
 J = jungel
-P = Piramis
-L = Lava : 30% dmg per round
+    P = Piramis
+        L = Lava : 30% dmg per round
 . = Talaj
 N = Nedves_talaj : 80% energy cost
 R = rekettyes : 40% energy cost
 r = vizes rekettyes
-F = falu
-f = vizes falu
-S = szentely
-C = csonak
+    F = falu
+    S = szentely
+    C = csonak
 '''
 
 
