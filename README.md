@@ -24,6 +24,7 @@ Call the interpreter: python3 GAME.py
 
 The game is in an early stage, It's still under development.
 The game consists of 6 files:  
+
   core_game.py -  Variables that are essential for almost all the functions in and outside of this file
                   Functions responsible for displaying the map, the inventory and for moving on the map (looping the game)
                   Function calls for starting the program
