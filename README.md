@@ -23,8 +23,23 @@ Call the interpreter: python3 GAME.py
 ## Note
 
 The game is in an early stage, It's still under development.
-The game consists of 2 files:  
-GAME.py - includes the vast majority of the code  
-GAME_displays.py - includes the ASCII text art for visuals, and some character references  
+The game consists of 6 files:  
 
+  core_game.py -  Variables that are essential for almost all the functions in and outside of this file
+                  Functions responsible for displaying the map, the inventory and for moving on the map (looping the game)
+                  Function calls for starting the program
+                  
+  GAME_displays.py - includes the ASCII text art for visuals, and some character references 
+  
+  random_map_generator.py - includes: Variables and functions for generating a new, random map for the game.
+  
+  village_and_companions.py - includes: Dictionary variables holding the keys and values for 'companions' and vendor  merchandise
+                                        Functions responsible for running the Village (trading,resting,hiring companions) ,   calculating the move cost in the
+                                            aspect of having more companions, giving and taking away benefits of companions on hiring or loosing them
+
+  passive_terrains.py: - includes: Functions for terrain types that have no interactive interface
+  
+  interactive_terrains: includes - Variables essential for the functions in this file
+                                   TERRAIN Functions for terrain types that have an interactive interface, and FEATURE functions that are called in the terrain type functions if they meet the requirements.
+                                   
 Built with Python3.

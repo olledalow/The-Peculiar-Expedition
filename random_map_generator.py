@@ -1,7 +1,12 @@
-from termcolor import colored
+# THIS FILE CONTAINS:
+# Variables and functions for generating a new, random map for the game.
+
+
+# from termcolor import colored
 import random
 
-map = [
+# This is the list table for the map. 16 rows and 16 columns
+game_map = [
     ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"],
     ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"],
     ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"],
@@ -19,554 +24,518 @@ map = [
     ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"],
     ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"],
 ]
-map_coordinates = []
-
-F_locations = []
-
-O_locations = []
-
-H_locations = []
-
-V_locations = []
 
 
-for row_index, row in enumerate(map):  # <- with the enumerate, I can print the indexes
-    for column_index, column in enumerate(row):  # <- with the enumerate, I can print the indexes
-        map_coordinates.append([row_index, column_index])
+map_coordinates = []  # contains the integer coordinates of the map elements in lists. : [row_index, column index]
 
-position = [8, 8]
-P_position = []
+F_locations = []  # contains the integer coordinates of the village (F) elements in lists. : [row_index, column index]
 
-def T_C_terrain(map):
-    T_chance = random.randint(1, 4)
-    C_chance = random.randint(0, 15)
+O_locations = []  # contains the integer coordinates of the Shrine (O) elements in lists. : [row_index, column index]
+
+H_locations = []  # contains the integer coordinates of the Mountain (H) elements in lists. : [row_index, column index]
+
+V_locations = []  # contains the integer coordinates of the Lake (V) elements in lists. : [row_index, column index]
+
+P_position = []  # contains the integer coordinates of the Pyramid (P) element in lists. : [row_index, column index]
+
+position = [0, 0]  # contains the integer coordinates of the current position on the map. : [row_index, column index]
+
+
+for row_index, row in enumerate(game_map):  # <- with the enumerate, I get the indexes
+    for column_index, column in enumerate(row):  # <- with the enumerate, I get the indexes
+        map_coordinates.append([row_index, column_index])  # filling up the map_coordinates list with coordinates.
+
+
+def t_c_terrain(current_map):
+    t_chance = random.randint(1, 4)
+    c_chance = random.randint(0, 15)
     global position
     global map_coordinates
 
-    if T_chance == 1:
+    if t_chance == 1:
         for r in range(16):
-            map[r][0] = "T"
+            current_map[r][0] = "T"
             for e in map_coordinates:  # COORDINATE DELETION
                 if e == [r, 0]:
                     map_coordinates.remove([r, 0])
 
-            if map[r][1] == map[C_chance][1]:
-                map[C_chance][1] = "C"
-                position = [C_chance, 1]
+            if current_map[r][1] == current_map[c_chance][1]:
+                current_map[c_chance][1] = "C"
+                position = [c_chance, 1]
                 for e in map_coordinates:  # COORDINATE DELETION
-                    if e == [C_chance, 1]:
-                        map_coordinates.remove([C_chance, 1])
+                    if e == [c_chance, 1]:
+                        map_coordinates.remove([c_chance, 1])
 
-            T1 = random.randint(1, 100)
-            if T1 < 85 and map[r][1] != "C":
-                map[r][1] = "T"
+            t1 = random.randint(1, 100)
+            if t1 < 85 and current_map[r][1] != "C":
+                current_map[r][1] = "T"
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [r, 1]:
                         map_coordinates.remove([r, 1])
 
-            T2 = random.randint(1, 100)
-            if T2 < 75 and map[r][1] == "T":
-                map[r][2] = "T"
+            t2 = random.randint(1, 100)
+            if t2 < 75 and current_map[r][1] == "T":
+                current_map[r][2] = "T"
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [r, 2]:
                         map_coordinates.remove([r, 2])
 
-            T3 = random.randint(1, 101)
-            if T3 < 50 and map[r][2] == "T":
-                map[r][3] = "T"
+            t3 = random.randint(1, 100)
+            if t3 < 50 and current_map[r][2] == "T":
+                current_map[r][3] = "T"
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [r, 3]:
                         map_coordinates.remove([r, 3])
 
-            # T4 = random.randint(1, 101)
-            # if T4 < 40 and map[r][3] == "T":
-            #     map[r][4] = "T"
-            #     for e in map_coordinates:  # COORDINATE DELETION
-            #         if e == [r, 3]:
-            #             map_coordinates.remove([r, 3])
-
-    elif T_chance == 2:
+    elif t_chance == 2:
         for r in range(16):
-            map[0][r] = "T"
+            current_map[0][r] = "T"
             for e in map_coordinates:  # COORDINATE DELETION
                 if e == [0, r]:
                     map_coordinates.remove([0, r])
 
-            if map[1][r] == map[1][C_chance]:
-                map[1][C_chance] = "C"
-                position = [1, C_chance]
+            if current_map[1][r] == current_map[1][c_chance]:
+                current_map[1][c_chance] = "C"
+                position = [1, c_chance]
                 for e in map_coordinates:  # COORDINATE DELETION
-                    if e == [1, C_chance]:
-                        map_coordinates.remove([1, C_chance])
+                    if e == [1, c_chance]:
+                        map_coordinates.remove([1, c_chance])
 
-            T1 = random.randint(1, 101)
-            if T1 < 85 and map[1][r] != "C":
-                map[1][r] = "T"
+            t1 = random.randint(1, 101)
+            if t1 < 85 and current_map[1][r] != "C":
+                current_map[1][r] = "T"
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [1, r]:
                         map_coordinates.remove([1, r])
 
-            T2 = random.randint(1, 101)
-            if T2 < 75 and map[1][r] == "T":
-                map[2][r] = "T"
+            t2 = random.randint(1, 101)
+            if t2 < 75 and current_map[1][r] == "T":
+                current_map[2][r] = "T"
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [2, r]:
                         map_coordinates.remove([2, r])
 
-            T3 = random.randint(1, 101)
-            if T3 < 50 and map[2][r] == "T":
-                map[3][r] = "T"
+            t3 = random.randint(1, 101)
+            if t3 < 50 and current_map[2][r] == "T":
+                current_map[3][r] = "T"
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [3, r]:
                         map_coordinates.remove([3, r])
 
-            # T4 = random.randint(1, 101)
-            # if T4 < 40 and map[3][r] == "T":
-            #     map[4][r] = "T"
-            #     for e in map_coordinates:  # COORDINATE DELETION
-            #         if e == [4, r]:
-            #             map_coordinates.remove([4, r])
-
-    elif T_chance == 3:
+    elif t_chance == 3:
         for r in range(16):
-            map[15][r] = "T"
+            current_map[15][r] = "T"
             for e in map_coordinates:  # COORDINATE DELETION
                 if e == [15, r]:
                     map_coordinates.remove([15, r])
 
-            if map[14][r] == map[14][C_chance]:
-                map[14][C_chance] = "C"
-                position = [14, C_chance]
+            if current_map[14][r] == current_map[14][c_chance]:
+                current_map[14][c_chance] = "C"
+                position = [14, c_chance]
                 for e in map_coordinates:  # COORDINATE DELETION
-                    if e == [14, C_chance]:
-                        map_coordinates.remove([14, C_chance])
+                    if e == [14, c_chance]:
+                        map_coordinates.remove([14, c_chance])
 
-            T1 = random.randint(1, 101)
-            if T1 < 85 and map[14][r] != "C":
-                map[14][r] = "T"
+            t1 = random.randint(1, 101)
+            if t1 < 85 and current_map[14][r] != "C":
+                current_map[14][r] = "T"
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [14, r]:
                         map_coordinates.remove([14, r])
 
-            T2 = random.randint(1, 101)
-            if T2 < 75 and map[14][r] == "T":
-                map[13][r] = "T"
+            t2 = random.randint(1, 101)
+            if t2 < 75 and current_map[14][r] == "T":
+                current_map[13][r] = "T"
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [13, r]:
                         map_coordinates.remove([13, r])
 
-            T3 = random.randint(1, 101)
-            if T3 < 50 and map[13][r] == "T":
-                map[12][r] = "T"
+            t3 = random.randint(1, 101)
+            if t3 < 50 and current_map[13][r] == "T":
+                current_map[12][r] = "T"
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [12, r]:
                         map_coordinates.remove([12, r])
 
-            # T4 = random.randint(1, 101)
-            # if T4 < 40 and map[12][r] == "T":
-            #     map[11][r] = "T"
-            #     for e in map_coordinates:  # COORDINATE DELETION
-            #         if e == [11, r]:
-            #             map_coordinates.remove([1, r])
-
-    elif T_chance == 4:
+    elif t_chance == 4:
         for r in range(16):
-            map[r][15] = "T"
+            current_map[r][15] = "T"
             for e in map_coordinates:  # COORDINATE DELETION
                 if e == [r, 15]:
                     map_coordinates.remove([r, 15])
 
-            if map[r][14] == map[C_chance][14]:
-                map[C_chance][14] = "C"
-                position = [C_chance, 14]
+            if current_map[r][14] == current_map[c_chance][14]:
+                current_map[c_chance][14] = "C"
+                position = [c_chance, 14]
                 for e in map_coordinates:  # COORDINATE DELETION
-                    if e == [C_chance, 14]:
-                        map_coordinates.remove([C_chance, 14])
+                    if e == [c_chance, 14]:
+                        map_coordinates.remove([c_chance, 14])
 
-            T1 = random.randint(1, 101)
-            if T1 < 85 and map[r][14] != "C":
-                map[r][14] = "T"
+            t1 = random.randint(1, 101)
+            if t1 < 85 and current_map[r][14] != "C":
+                current_map[r][14] = "T"
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [r, 14]:
                         map_coordinates.remove([r, 14])
 
-            T2 = random.randint(1, 101)
-            if T2 < 75 and map[r][14] == "T":
-                map[r][13] = "T"
+            t2 = random.randint(1, 101)
+            if t2 < 75 and current_map[r][14] == "T":
+                current_map[r][13] = "T"
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [r, 13]:
                         map_coordinates.remove([r, 13])
 
-            T3 = random.randint(1, 101)
-            if T3 < 50 and map[r][13] == "T":
-                map[r][12] = "T"
+            t3 = random.randint(1, 101)
+            if t3 < 50 and current_map[r][13] == "T":
+                current_map[r][12] = "T"
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [r, 12]:
                         map_coordinates.remove([r, 12])
 
-            # T4 = random.randint(1, 101)
-            # if T4 < 40 and map[r][12] == "T":
-            #     map[r][11] = "T"
-            #     for e in map_coordinates:  # COORDINATE DELETION
-            #         if e == [r, 11]:
-            #             map_coordinates.remove([r, 11])
 
-def F_terrain(map):
+def f_terrain(current_map):
     global map_coordinates
     global F_locations
 
-    F_number = random.randint(2, 3)
+    f_number = random.randint(2, 3)
 
-    while F_number > 0:
+    while f_number > 0:
         x = random.randint(0, len(map_coordinates) - 1)
         if abs((position[0] + position[1]) - (map_coordinates[x][0] + map_coordinates[x][1])) < 4:
             continue
         else:
             if len(F_locations) == 0:
-                map[map_coordinates[x][0]][map_coordinates[x][1]] = "F"
+                current_map[map_coordinates[x][0]][map_coordinates[x][1]] = "F"
                 F_locations.append([map_coordinates[x][0], map_coordinates[x][1]])
                 map_coordinates.pop(x)
-                F_number -= 1
+                f_number -= 1
 
             elif len(F_locations) == 1:
                 if abs((F_locations[0][0] + F_locations[0][1]) - (map_coordinates[x][0] + map_coordinates[x][1])) < 6:
                     continue
                 else:
-                    map[map_coordinates[x][0]][map_coordinates[x][1]] = "F"
+                    current_map[map_coordinates[x][0]][map_coordinates[x][1]] = "F"
                     F_locations.append([map_coordinates[x][0], map_coordinates[x][1]])
                     map_coordinates.pop(x)
-                    F_number -= 1
+                    f_number -= 1
 
             elif len(F_locations) == 2:
                 if abs((F_locations[0][0] + F_locations[0][1]) - (map_coordinates[x][0] + map_coordinates[x][1])) < 6 \
-                        or abs((F_locations[1][0] + F_locations[1][1]) - (map_coordinates[x][0] + map_coordinates[x][1])) < 6:
+                        or abs((F_locations[1][0] + F_locations[1][1]) -
+                               (map_coordinates[x][0] + map_coordinates[x][1])) < 6:
                     continue
                 else:
-                    map[map_coordinates[x][0]][map_coordinates[x][1]] = "F"
+                    current_map[map_coordinates[x][0]][map_coordinates[x][1]] = "F"
                     F_locations.append([map_coordinates[x][0], map_coordinates[x][1]])
                     map_coordinates.pop(x)
-                    F_number -= 1
+                    f_number -= 1
 
 
-
-def V_terrain(map):
+def v_terrain(current_map):
     global map_coordinates
     global V_locations
-    V_number = random.randint(2, 3)
-    V_amount = [1, 2, 3, 4]
+    v_number = random.randint(2, 3)
 
-    while V_number > 0:
+    while v_number > 0:
         x = random.randint(0, len(map_coordinates) - 1)
         if abs((position[0] + position[1]) - (map_coordinates[x][0] + map_coordinates[x][1])) < 6 or \
                 abs((P_position[0] + P_position[1]) - (map_coordinates[x][0] + map_coordinates[x][1])) < 6:
             continue
         else:
-            map[map_coordinates[x][0]][map_coordinates[x][1]] = "V"
+            current_map[map_coordinates[x][0]][map_coordinates[x][1]] = "V"
             V_locations.append([map_coordinates[x][0], map_coordinates[x][1]])
-            V_number -= 1
+            v_number -= 1
 
-            for e in V_amount:
+            for e in range(4):
                 y = random.randint(1, 10)
                 if y <= 6:
                     try:
                         y = random.randint(1, 4)
                         if y == 1:
-                            map[map_coordinates[x][0] + 1][map_coordinates[x][1]] = "V"
+                            current_map[map_coordinates[x][0] + 1][map_coordinates[x][1]] = "V"
                             V_locations.append([map_coordinates[x][0] + 1, map_coordinates[x][1]])
                         elif y == 2:
-                            map[map_coordinates[x][0] - 1][map_coordinates[x][1]] = "V"
+                            current_map[map_coordinates[x][0] - 1][map_coordinates[x][1]] = "V"
                             V_locations.append([map_coordinates[x][0] - 1, map_coordinates[x][1]])
                         elif y == 3:
-                            map[map_coordinates[x][0]][map_coordinates[x][1] + 1] = "V"
+                            current_map[map_coordinates[x][0]][map_coordinates[x][1] + 1] = "V"
                             V_locations.append([map_coordinates[x][0], map_coordinates[x][1] + 1])
                         elif y == 4:
-                            map[map_coordinates[x][0]][map_coordinates[x][1] - 1] = "V"
+                            current_map[map_coordinates[x][0]][map_coordinates[x][1] - 1] = "V"
                             V_locations.append([map_coordinates[x][0], map_coordinates[x][1] - 1])
 
                     except IndexError:
                         # if the coordinate is out of coordinates
                         pass
 
-    print("V:")
     for e in V_locations:
-        print(e, end="")
         try:
             map_coordinates.remove(e)
         except ValueError:
             # If the element is not in the list anymore
             pass
-    print()
 
 
-def H_terrain(map):
+def h_terrain(current_map):
     global map_coordinates
     global H_locations
-    H_number = random.randint(6, 7)
-    H_amount = [1, 2, 3, 4, 5]
+    h_number = random.randint(4, 5)
 
-    while H_number > 0:
+    while h_number > 0:
         x = random.randint(0, len(map_coordinates) - 1)
         if abs((position[0] + position[1]) - (map_coordinates[x][0] + map_coordinates[x][1])) < 6 or \
                 abs((P_position[0] + P_position[1]) - (map_coordinates[x][0] + map_coordinates[x][1])) < 6:
             continue
         else:
-            map[map_coordinates[x][0]][map_coordinates[x][1]] = "H"
+            current_map[map_coordinates[x][0]][map_coordinates[x][1]] = "H"
             H_locations.append([map_coordinates[x][0], map_coordinates[x][1]])
-            H_number -= 1
+            h_number -= 1
 
-            for e in H_amount:
+            for e in range(5):
                 y = random.randint(1, 10)
-                if y <= 4:
+                if y <= 6:
                     try:
                         y = random.randint(1, 4)
                         if y == 1:
-                            map[map_coordinates[x][0] + 1][map_coordinates[x][1]] = "H"
+                            current_map[map_coordinates[x][0] + 1][map_coordinates[x][1]] = "H"
                             H_locations.append([map_coordinates[x][0] + 1, map_coordinates[x][1]])
-                            map[map_coordinates[x][0] + 2][map_coordinates[x][1]] = "H"
+                            current_map[map_coordinates[x][0] + 2][map_coordinates[x][1]] = "H"
                             H_locations.append([map_coordinates[x][0] + 2, map_coordinates[x][1]])
                         elif y == 2:
-                            map[map_coordinates[x][0] - 1][map_coordinates[x][1]] = "H"
+                            current_map[map_coordinates[x][0] - 1][map_coordinates[x][1]] = "H"
                             H_locations.append([map_coordinates[x][0] - 1, map_coordinates[x][1]])
-                            map[map_coordinates[x][0] - 2][map_coordinates[x][1]] = "H"
+                            current_map[map_coordinates[x][0] - 2][map_coordinates[x][1]] = "H"
                             H_locations.append([map_coordinates[x][0] - 2, map_coordinates[x][1]])
                         elif y == 3:
-                            map[map_coordinates[x][0]][map_coordinates[x][1] + 1] = "H"
+                            current_map[map_coordinates[x][0]][map_coordinates[x][1] + 1] = "H"
                             H_locations.append([map_coordinates[x][0], map_coordinates[x][1] + 1])
-                            map[map_coordinates[x][0]][map_coordinates[x][1] + 2] = "H"
+                            current_map[map_coordinates[x][0]][map_coordinates[x][1] + 2] = "H"
                             H_locations.append([map_coordinates[x][0], map_coordinates[x][1] + 2])
                         elif y == 4:
-                            map[map_coordinates[x][0]][map_coordinates[x][1] - 1] = "H"
+                            current_map[map_coordinates[x][0]][map_coordinates[x][1] - 1] = "H"
                             H_locations.append([map_coordinates[x][0], map_coordinates[x][1] - 1])
-                            map[map_coordinates[x][0]][map_coordinates[x][1] - 2] = "H"
+                            current_map[map_coordinates[x][0]][map_coordinates[x][1] - 2] = "H"
                             H_locations.append([map_coordinates[x][0], map_coordinates[x][1] - 2])
 
                     except IndexError:
-
                         pass
 
-    print("H:")
     for e in H_locations:
-        print(e, end="")
         try:
             map_coordinates.remove(e)
         except ValueError:
             pass
-    print()
 
 
-def O_terrain(map):
+def o_terrain(current_map):
     global map_coordinates
     global O_locations
 
-    O_number = random.randint(2, 3)
+    o_number = random.randint(2, 3)
 
-    while O_number > 0:
+    while o_number > 0:
         x = random.randint(0, len(map_coordinates) - 1)
         if abs((position[0] + position[1]) - (map_coordinates[x][0] + map_coordinates[x][1])) < 4:
             continue
         else:
             if len(O_locations) == 0:
-                map[map_coordinates[x][0]][map_coordinates[x][1]] = "O"
+                current_map[map_coordinates[x][0]][map_coordinates[x][1]] = "O"
                 O_locations.append([map_coordinates[x][0], map_coordinates[x][1]])
                 map_coordinates.pop(x)
-                O_number -= 1
+                o_number -= 1
 
             elif len(O_locations) == 1:
                 if abs((O_locations[0][0] + O_locations[0][1]) - (map_coordinates[x][0] + map_coordinates[x][1])) < 6:
                     continue
                 else:
-                    map[map_coordinates[x][0]][map_coordinates[x][1]] = "O"
+                    current_map[map_coordinates[x][0]][map_coordinates[x][1]] = "O"
                     O_locations.append([map_coordinates[x][0], map_coordinates[x][1]])
                     map_coordinates.pop(x)
-                    O_number -= 1
+                    o_number -= 1
 
             elif len(O_locations) == 2:
                 if abs((O_locations[0][0] + O_locations[0][1]) - (map_coordinates[x][0] + map_coordinates[x][1])) < 6 \
-                        or abs((O_locations[1][0] + O_locations[1][1]) - (map_coordinates[x][0] + map_coordinates[x][1])) < 6:
+                        or abs((O_locations[1][0] + O_locations[1][1]) -
+                               (map_coordinates[x][0] + map_coordinates[x][1])) < 6:
                     continue
                 else:
-                    map[map_coordinates[x][0]][map_coordinates[x][1]] = "O"
+                    current_map[map_coordinates[x][0]][map_coordinates[x][1]] = "O"
                     O_locations.append([map_coordinates[x][0], map_coordinates[x][1]])
                     map_coordinates.pop(x)
-                    O_number -= 1
+                    o_number -= 1
 
 
-def P_terrain(map):
+def p_terrain(current_map):
     global map_coordinates
     global P_position
-    P_number = 1
+    p_number = 1
 
-    while P_number > 0:
+    while p_number > 0:
         x = random.randint(0, len(map_coordinates) - 1)
         if abs((position[0] + position[1]) - (map_coordinates[x][0] + map_coordinates[x][1])) < 14:
             continue
         else:
-            map[map_coordinates[x][0]][map_coordinates[x][1]] = "P"
+            current_map[map_coordinates[x][0]][map_coordinates[x][1]] = "P"
             P_position = [map_coordinates[x][0], map_coordinates[x][1]]
             map_coordinates.pop(x)
-            P_number -= 1
+            p_number -= 1
 
 
-def B_terrain(map):
+def b_terrain(current_map):
     global H_locations
 
-    B_number = random.randint(3, 4)
+    b_number = random.randint(3, 4)
 
-    while B_number > 0:
+    while b_number > 0:
         x = len(H_locations)
         y = random.randint(0, x-1)
         z = H_locations[y]
-        if map[z[0]][z[1]] == "B":
+        if current_map[z[0]][z[1]] == "B":
             continue
         else:
-            map[z[0]][z[1]] = "B"
-            B_number -= 1
+            current_map[z[0]][z[1]] = "B"
+            b_number -= 1
             H_locations.remove(z)
 
-    print("H after B:")
     for e in H_locations:
-        print(e, end="")
         try:
             map_coordinates.remove(e)
         except ValueError:
             pass
-    print()
 
 
-def S_terrain(map):
+def s_terrain(current_map):
     global H_locations
 
-    S_number = random.randint(3, 4)
+    s_number = random.randint(3, 4)
 
-    while S_number > 0:
+    while s_number > 0:
         x = len(H_locations)
         y = random.randint(0, x-1)
         z = H_locations[y]
-        if map[z[0]][z[1]] == "S":
+        if current_map[z[0]][z[1]] == "S":
             continue
         else:
-            map[z[0]][z[1]] = "S"
-            S_number -= 1
+            current_map[z[0]][z[1]] = "S"
+            s_number -= 1
             H_locations.remove(z)
 
-    print("H after S:")
     for e in H_locations:
-        print(e, end="")
         try:
             map_coordinates.remove(e)
         except ValueError:
             pass
-    print()
 
-def dot_J_R_terrain(map):
+
+def dot_j_r_terrain(current_map):
     global map_coordinates
 
     for e in map_coordinates:
         x = random.randint(1, 3)
         if x == 1:
-            map[e[0]][e[1]] = "."
+            current_map[e[0]][e[1]] = "."
 
         elif x == 2:
-            map[e[0]][e[1]] = "J"
+            current_map[e[0]][e[1]] = "J"
 
         elif x == 3:
-            map[e[0]][e[1]] = "R"
+            current_map[e[0]][e[1]] = "R"
 
-def wet_terrain(map):
+
+def wet_terrain(current_map):
     for e in V_locations:
         try:
-            if map[e[0] + 1][e[1]] == "R":
-                map[e[0] + 1][e[1]] = "r"
+            if current_map[e[0] + 1][e[1]] == "R":
+                current_map[e[0] + 1][e[1]] = "r"
         except IndexError:
             continue
 
         try:
-            if map[e[0] + 1][e[1] + 1] == "R":
-                map[e[0] + 1][e[1] + 1] = "r"
+            if current_map[e[0] + 1][e[1] + 1] == "R":
+                current_map[e[0] + 1][e[1] + 1] = "r"
         except IndexError:
             continue
 
         try:
-            if map[e[0] - 1][e[1]] == "R":
-                map[e[0] - 1][e[1]] = "r"
+            if current_map[e[0] - 1][e[1]] == "R":
+                current_map[e[0] - 1][e[1]] = "r"
         except IndexError:
             continue
 
         try:
-            if map[e[0] - 1][e[1] - 1] == "R":
-                map[e[0] - 1][e[1] - 1] = "r"
+            if current_map[e[0] - 1][e[1] - 1] == "R":
+                current_map[e[0] - 1][e[1] - 1] = "r"
         except IndexError:
             continue
 
         try:
-            if map[e[0]][e[1] + 1] == "R":
-                map[e[0]][e[1] + 1] = "r"
+            if current_map[e[0]][e[1] + 1] == "R":
+                current_map[e[0]][e[1] + 1] = "r"
         except IndexError:
             continue
 
         try:
-            if map[e[0] - 1][e[1] + 1] == "R":
-                map[e[0] - 1][e[1] + 1] = "r"
+            if current_map[e[0] - 1][e[1] + 1] == "R":
+                current_map[e[0] - 1][e[1] + 1] = "r"
         except IndexError:
             continue
 
         try:
-            if map[e[0]][e[1] - 1] == "R":
-                map[e[0]][e[1] - 1] = "r"
+            if current_map[e[0]][e[1] - 1] == "R":
+                current_map[e[0]][e[1] - 1] = "r"
         except IndexError:
             continue
 
         try:
-            if map[e[0] + 1][e[1] - 1] == "R":
-                map[e[0] + 1][e[1] - 1] = "r"
-        except IndexError:
-            continue
-
-
-        try:
-            if map[e[0] + 1][e[1]] == ".":
-                map[e[0] + 1][e[1]] = "N"
+            if current_map[e[0] + 1][e[1] - 1] == "R":
+                current_map[e[0] + 1][e[1] - 1] = "r"
         except IndexError:
             continue
 
         try:
-            if map[e[0] + 1][e[1] + 1] == ".":
-                map[e[0] + 1][e[1] + 1] = "N"
+            if current_map[e[0] + 1][e[1]] == ".":
+                current_map[e[0] + 1][e[1]] = "N"
         except IndexError:
             continue
 
         try:
-            if map[e[0] - 1][e[1]] == ".":
-                map[e[0] - 1][e[1]] = "N"
+            if current_map[e[0] + 1][e[1] + 1] == ".":
+                current_map[e[0] + 1][e[1] + 1] = "N"
         except IndexError:
             continue
 
         try:
-            if map[e[0] - 1][e[1] - 1] == ".":
-                map[e[0] - 1][e[1] - 1] = "N"
+            if current_map[e[0] - 1][e[1]] == ".":
+                current_map[e[0] - 1][e[1]] = "N"
         except IndexError:
             continue
 
         try:
-            if map[e[0]][e[1] + 1] == ".":
-                map[e[0]][e[1] + 1] = "N"
+            if current_map[e[0] - 1][e[1] - 1] == ".":
+                current_map[e[0] - 1][e[1] - 1] = "N"
         except IndexError:
             continue
 
         try:
-            if map[e[0] - 1][e[1] + 1] == ".":
-                map[e[0] - 1][e[1] + 1] = "N"
+            if current_map[e[0]][e[1] + 1] == ".":
+                current_map[e[0]][e[1] + 1] = "N"
         except IndexError:
             continue
 
         try:
-            if map[e[0] + 1][e[1] - 1] == ".":
-                map[e[0] + 1][e[1] - 1] = "N"
+            if current_map[e[0] - 1][e[1] + 1] == ".":
+                current_map[e[0] - 1][e[1] + 1] = "N"
+        except IndexError:
+            continue
+
+        try:
+            if current_map[e[0] + 1][e[1] - 1] == ".":
+                current_map[e[0] + 1][e[1] - 1] = "N"
         except IndexError:
             continue
 
 
-# def display_map(map, position):
+# def display_map(current_map, current_position):
 #     for row_index, row in enumerate(map):  # <- with the enumerate, I can print the indexes
 #         for column_index, column in enumerate(row):  # <- with the enumerate, I can print the indexes
 #
@@ -591,20 +560,18 @@ def wet_terrain(map):
 #                     print(column + " ", end="")
 #         print()
 
-# print(len(map_coordinates))
-T_C_terrain(map)
-P_terrain(map)
-V_terrain(map)
-H_terrain(map)
-B_terrain(map)
-F_terrain(map)
-O_terrain(map)
-S_terrain(map)
-dot_J_R_terrain(map)
-wet_terrain(map)
 
+# CALLING THE FUNCTIONS IN ORDER.
+t_c_terrain(game_map)
+p_terrain(game_map)
+v_terrain(game_map)
+h_terrain(game_map)
+b_terrain(game_map)
+f_terrain(game_map)
+o_terrain(game_map)
+s_terrain(game_map)
+dot_j_r_terrain(game_map)
+wet_terrain(game_map)
 
 
 # display_map(map, position)
-# print(map_coordinates)
-# print(len(map_coordinates))
