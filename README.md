@@ -31,6 +31,7 @@ The game consists of 6 files:
   GAME_displays.py - includes the ASCII text art for visuals, and some character references 
   
   random_map_generator.py - includes: Variables and functions for generating a new, random map for the game.
+  
   village_and_companions.py - includes: Dictionary variables holding the keys and values for 'companions' and vendor  merchandise
                                         Functions responsible for running the Village (trading,resting,hiring companions) ,   calculating the move cost in the
                                             aspect of having more companions, giving and taking away benefits of companions on hiring or loosing them
