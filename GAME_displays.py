@@ -1,19 +1,24 @@
+# THIS FILE CONTAINS:
+# Basic nomenclature table
+# Functions for displaying visuals. (ASCII text art)
+
+
 '''
-    T = Tenger
-    V = viz
-    H = Hegy
-    B = Barlang
-    O = Oltar
+T = Tenger
+V = viz
+H = Hegy
+B = Barlang
+O = Oltar
 J = jungel
-    P = Piramis
-        L = Lava : 30% dmg per round
+P = Piramis
+L = Lava : 30% dmg per round
 . = Talaj
 N = Nedves_talaj : 80% energy cost
 R = rekettyes : 40% energy cost
 r = vizes rekettyes
-    F = falu
-    S = szentely
-    C = csonak
+F = falu
+S = szentely
+C = csonak
 '''
 
 
@@ -97,6 +102,7 @@ def display_shrine():
     print("                     |____//=======\\____|")
     print("                         //=========\\")
 
+
 def display_shrine_door():
     print(("\n") * 10)
     print("                       _             _,-----------._        ___")
@@ -133,6 +139,7 @@ def display_shrine_door():
     print("                     {______}     \___________________/     {______}")
     print("                 SSt |______|_______________________________|______|")
 
+
 def display_shrine_runes():
     print(("\n") * 20)
     print("|    |\   |      /|  |\  |/")
@@ -146,6 +153,7 @@ def display_shrine_runes():
     print("|\   |\  \|/   |    |/   /\ ")
     print("|<   |    |    |    |    \/")
     print("|/   |    |   /|\  /|    /\ ")
+
 
 def display_shrine_room():
     print(("\n") * 20)
@@ -172,6 +180,7 @@ def display_shrine_room():
     print("|/                                   | ")
     print("+------------------------------------+ ")
 
+
 def display_shrine_doll():
     print(("\n") * 20)
     print("            .-.'  '.-.")
@@ -189,6 +198,7 @@ def display_shrine_doll():
     print("            <_/\__/\_>")
     print("           _/  /  \  \_")
     print("          (___/    \___)")
+
 
 def display_shrine_chest():
     print(("\n") * 25)
@@ -209,8 +219,9 @@ def display_shrine_chest():
     print("              |  _\o/   __  {.' __  '.} _   _\o/  _|")
     print("              `""""-""""""""""""""""""""""""""-""""`")
 
+
 def display_shrine_treasure():
-    print(("\n") * 20)
+    print("\n" * 20)
     print("                            ,--.")
     print("                           {    }")
     print("                           K,   }")
@@ -237,8 +248,9 @@ def display_shrine_treasure():
     print("          `'{_            )")
     print("              ^^\..___,.--`")
 
+
 def display_curse_volcano():
-    print(("\n") * 20)
+    print("\n" * 20)
     print("                        (   (( . : (    .)   ) :  )")
     print("                          (   ( :  .  :    :  )  ))")
     print("                           ( ( ( (  .  :  . . ) )")
@@ -263,8 +275,9 @@ def display_curse_volcano():
     print("                   |M|       ---- .  ___.|n| /\___\  X")
     print("                             |mm| X  |n|X    ||___|        ")
 
+
 def display_curse_geyser():
-    print(("\n") * 20)
+    print("\n" * 20)
     print("         ____ /\ ____            _ _   --           - -__     -_")
     print("        /v y \/\/    \                   --  --___     _ __--__ -' _")
     print("       ____\7 \\_^_^/ \                            _ --        -_ '-_")
@@ -282,6 +295,7 @@ def display_curse_geyser():
     print("                ()   _'>--'> _ .-- '      - '''")
     print("")
     print('                        """')
+
 
 def display_crew():
     print("                                                                                            ,")
@@ -320,8 +334,9 @@ def display_crew():
     print("                                  (____)  (____)                      |_|   ///`  '\ \         ")
     print("                               ~SCOUT~                                            ~SHAMAN~ ")
 
+
 def display_bag():
-    print(("\n") * 20)
+    print("\n" * 20)
     print("   .eec.              .e$$$c   ")
     print("  z$*'*$$eec..       zP  .3$c     ~BACKPACK~   ")
     print(" .$'  d$'  '''****bee*=*'' *$    ")
