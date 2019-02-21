@@ -7,26 +7,25 @@
 from termcolor import colored
 import random
 
-from random_map_generator import game_map
-from random_map_generator import position
+from random_map_generator import game_map, position, fog_map, fog, sight
 
 from passive_terrains import dot, r, r_wet, dot_wet, j
 from interactive_terrains import o, s, b, volcano_back, injured_list, injured, injury
-from village_and_companions import f, vendor, crew_recruitment
+from OOP_player import player
+from OOP_terrains import Village
+# from OOP_village import current_vendor
+# from GAME_displays import display_merchant
 
-from GAME_displays import display_bag
 
-energy = 100  # used for steps (movement), may also decrease when catastrophe happens. displayed as green u"\u25A0" bar
 EC = 3  # ENERGY COST: game difficulty. minimal energy cost for a move.
-gold = 1000  # starting gold
 moves = 0  # number of moves the player made in the game
 four_steps = []  # saves the current moves number for later use (after 4 steps its used)
 company_cost = 1  # initial multiplier for movement cost. it increases with more companions
 slots_cost = 1  # initial multiplier for movement cost. it increases if the player has more items than allowed slots.
 allowed_slots = 8  # amount of items the player can carry without increasing the energy cost of steps
 
-# ITEMS: NAME/AMOUNT/COST/ATTRIBUTE
-inventory = {
+# ITEMS: [NAME/AMOUNT/COST/ATTRIBUTE]
+inventory = {  # starting items in player's inventory
     "glassball": [1, 100, 0],
     "whiskey": [1, 50, 20],
     "fruit": [5, 45, 15],
@@ -37,62 +36,62 @@ inventory = {
 }
 
 
-companions = {
+companions = {  # will contain the companions the player hires
 }
 
 
-def display_inventory(current_energy):
-    # display inventory, shows free slots or excess item number, prints energy bar,
-    # allow the player to consume food or drink to restore energy
-    display_bag()
-    if len(inventory) > allowed_slots:
-        print(str(len(inventory)) + " out of " + str(allowed_slots) + ". You are carrying" +
-              str(len(inventory) - allowed_slots) + "extra items in your hand.")
-    else:
-        print(str(len(inventory)) + " out of " + str(allowed_slots) + ". You have " +
-              str(allowed_slots - len(inventory)) + " free slots left.")
-    for e in inventory:
-        if inventory[e][0] != 0:
-            print(e, inventory[e][0])  # print inventory elements if have any of it.
-
-    while True:
-        print("     min _________________________ max")
-        print("energy: |" + colored(str(int(current_energy / 4) * u"\u25A0"), "green"))
-
-        if "soldier" in companions:
-            print("Because you have a Soldier companion, you get extra 20% energy when drinking whiskey")
-        if "shaman" in companions:
-            print("Because you have a Shaman companion, you get extra 20% energy when using medicine")
-
-        x = input("choose food or drink to consume for energy or press 'ENTER' to exit: \n")
-        if x == "fruit" or x == "whiskey" or x == "medicine" or x == "chocolate" or x == "meat":
-            for e in list(inventory):
-                if x == e:
-                    try:
-                        y = int(input("How many would you like to eat or drink? "))
-                        if inventory[e][0] - y > -1:
-                            if current_energy + (inventory[e][2] * y) > 100:
-                                current_energy = 100
-                                inventory[e][0] -= y
-                                if inventory[e][0] == 0:
-                                    inventory.pop(e, None)
-
-                            else:
-                                current_energy += (inventory[e][2] * y)
-                                inventory[e][0] -= y
-                                if inventory[e][0] == 0:
-                                    inventory.pop(e, None)
-
-                        else:
-                            print("You don't have that much...")
-                    except ValueError:
-                        input("That is not a valid number!")
-                        pass
-        else:
-            slot_cost = slots()
-            current_energy -= 0
-            return current_energy, slot_cost
-
+# def display_inventory(current_energy):
+#     # display inventory, shows free slots or excess item number, prints energy bar,
+#     # allow the player to consume food or drink to restore energy
+#     display_bag()
+#     if len(inventory) > allowed_slots:
+#         print(str(len(inventory)) + " out of " + str(allowed_slots) + ". You are carrying" +
+#               str(len(inventory) - allowed_slots) + "extra items in your hand.")
+#     else:
+#         print(str(len(inventory)) + " out of " + str(allowed_slots) + ". You have " +
+#               str(allowed_slots - len(inventory)) + " free slots left.")
+#     for e in inventory:
+#         if inventory[e][0] != 0:
+#             print(e, inventory[e][0])  # print inventory elements if have any of it.
+#
+#     while True:
+#         print("     min _________________________ max")
+#         print("energy: |" + colored(str(int(current_energy / 4) * u"\u25A0"), "green"))
+#
+#         if "soldier" in companions:
+#             print("Because you have a Soldier companion, you get extra 20% energy when drinking whiskey")
+#         if "shaman" in companions:
+#             print("Because you have a Shaman companion, you get extra 20% energy when using medicine")
+#
+#         x = input("choose food or drink to consume for energy or press 'ENTER' to exit: \n")
+#         if x == "fruit" or x == "whiskey" or x == "medicine" or x == "chocolate" or x == "meat":
+#             for e in list(inventory):
+#                 if x == e:
+#                     try:
+#                         y = int(input("How many would you like to eat or drink? "))
+#                         if inventory[e][0] - y > -1:
+#                             if current_energy + (inventory[e][2] * y) > 100:
+#                                 current_energy = 100
+#                                 inventory[e][0] -= y
+#                                 if inventory[e][0] == 0:
+#                                     inventory.pop(e, None)
+#
+#                             else:
+#                                 current_energy += (inventory[e][2] * y)
+#                                 inventory[e][0] -= y
+#                                 if inventory[e][0] == 0:
+#                                     inventory.pop(e, None)
+#
+#                         else:
+#                             print("You don't have that much...")
+#                     except ValueError:
+#                         input("That is not a valid number!")
+#                         pass
+#         else:
+#             slot_cost = slots()
+#             current_energy -= 0
+#             return current_energy, slot_cost
+#
 
 def slots():
     # If there is more items in inventory than allowed, moves cost more energy.
@@ -105,6 +104,52 @@ def slots():
 
 
 def display_map(current_map, current_position):
+    # Displays the map with the current location after every move
+    # fog(fog_map)
+    print("\n" * 30)
+    fog()
+    for row_index, row in enumerate(current_map):  # <- with the enumerate, I can print the indexes
+        for column_index, column in enumerate(row):  # <- with the enumerate, I can print the indexes
+
+            if row_index == current_position[0] and column_index == current_position[1]:
+                # If the array element = to our position
+                print('\x1b[5;31;43m' + column + " " + '\x1b[0m', end="")  # Print the position with red and yellow
+
+            else:  # print the terrain types in different color
+                if fog_map[row_index][column_index] == "!":
+                    if column in "TVG":
+                        print(colored(column + " ", "blue"), end="")
+                    if column in "SHB":
+                        print(colored(column + " ", "grey"), end="")
+                    if column in "JR.":
+                        print(colored(column + " ", "green"), end="")
+                    if column in "P":
+                        print(colored(column + " ", "yellow"), end="")
+                    if column in "Nrf":
+                        print(colored(column + " ", "cyan"), end="")
+                    if column in "L@":
+                        print(colored(column + " ", "red"), end="")
+                    if column in "FOC":
+                        print(column + " ", end="")
+                else:
+                    if column in "TVG":
+                        print("?" + " ", end="")
+                    if column in "SHB":
+                        print("?" + " ", end="")
+                    if column in "JR.":
+                        print("?" + " ", end="")
+                    if column in "P":
+                        print("?" + " ", end="")
+                    if column in "Nrf":
+                        print("?" + " ", end="")
+                    if column in "L@":
+                        print("?" + " ", end="")
+                    if column in "FOC":
+                        print("?" + " ", end="")
+        print()
+
+
+def display_oldmap(current_map, current_position):
     # Displays the map with the current location after every move
     print("\n" * 30)
     for row_index, row in enumerate(current_map):  # <- with the enumerate, I can print the indexes
@@ -133,7 +178,7 @@ def display_map(current_map, current_position):
 
 
 def move(current_map, current_energy, current_gold, current_position, current_companions, current_inventory,
-         companions_cost, move_cost, def_slot, current_vendor, currently_injured, injureds_list):
+         companions_cost, move_cost, def_slot, currently_injured, injureds_list, scout_sight):
 
     global moves, slots_cost, company_cost, four_steps, allowed_slots
     while current_energy > 0:
@@ -163,10 +208,11 @@ def move(current_map, current_energy, current_gold, current_position, current_co
                     current_position[0] -= 1
 
                 elif current_map[current_position[0] - 1][current_position[1]] in "Ff":
-                    current_gold, current_energy, \
-                        slots_cost, company_cost = f(current_gold, current_energy, current_vendor,
-                                                     current_companions, current_inventory, def_slot)
-                    current_position[0] -= 1
+                    Village().in_village()
+                    # current_gold, current_energy, \
+                    #     slots_cost, company_cost = f(current_gold, current_energy, current_vendor,
+                    #                                  current_companions, current_inventory, def_slot, scout_sight)
+                    # current_position[0] -= 1
 
                 elif current_map[current_position[0] - 1][current_position[1]] == "O":
                     current_position[0] -= 1
@@ -217,10 +263,11 @@ def move(current_map, current_energy, current_gold, current_position, current_co
                     current_position[0] += 1
 
                 elif current_map[current_position[0] + 1][current_position[1]] in "Ff":
-                    current_gold, current_energy, \
-                        slots_cost, company_cost = f(current_gold, current_energy, current_vendor,
-                                                     current_companions, current_inventory, def_slot)
-                    current_position[0] += 1
+                    Village().in_village()
+                    # current_gold, current_energy, \
+                    #     slots_cost, company_cost = f(current_gold, current_energy, current_vendor,
+                    #                                  current_companions, current_inventory, def_slot, scout_sight)
+                    # current_position[0] += 1
 
                 elif current_map[current_position[0] + 1][current_position[1]] in "O":
                     current_position[0] += 1
@@ -271,10 +318,11 @@ def move(current_map, current_energy, current_gold, current_position, current_co
                     current_position[1] -= 1
 
                 elif current_map[current_position[0]][current_position[1] - 1] in "Ff":
-                    current_gold, current_energy, \
-                        slots_cost, company_cost = f(current_gold, current_energy, current_vendor,
-                                                     current_companions, current_inventory, def_slot)
-                    current_position[1] -= 1
+                    Village().in_village()
+                    # current_gold, current_energy, \
+                    #     slots_cost, company_cost = f(current_gold, current_energy, current_vendor,
+                    #                                  current_companions, current_inventory, def_slot, scout_sight)
+                    # current_position[1] -= 1
 
                 elif current_map[current_position[0]][current_position[1] - 1] in "O":
                     current_position[1] -= 1
@@ -325,10 +373,11 @@ def move(current_map, current_energy, current_gold, current_position, current_co
                     current_position[1] += 1
 
                 elif current_map[current_position[0]][current_position[1] + 1] in "Ff":
-                    current_gold, current_energy, \
-                        slots_cost, company_cost = f(current_gold, current_energy, current_vendor,
-                                                     current_companions, current_inventory, def_slot)
-                    current_position[1] += 1
+                    Village().in_village()
+                    # current_gold, current_energy, \
+                    #     slots_cost, company_cost = f(current_gold, current_energy, current_vendor,
+                    #                                  current_companions, current_inventory, def_slot, scout_sight)
+                    # current_position[1] += 1
 
                 elif current_map[current_position[0]][current_position[1] + 1] in "O":
                     current_position[1] += 1
@@ -358,7 +407,7 @@ def move(current_map, current_energy, current_gold, current_position, current_co
                     current_position[1] += 1
 
         elif moving == "b":
-            current_energy, slots_cost = display_inventory(current_energy)
+            player.display_inventory()
         elif moving == "c":
             if len(companions) > 0:
                 for e in companions:
@@ -376,21 +425,29 @@ def move(current_map, current_energy, current_gold, current_position, current_co
             #  5% chance on calling the injury funciton.
             if random.randint(1, 100) < 5:
                 company_cost, currently_injured, allowed_slots = injury(current_companions, current_inventory,
-                                                                        allowed_slots)
+                                                                        allowed_slots, scout_sight)
 
         display_map(current_map, position)
         print("     min _________________________ max")
-        print("energy: |" + colored(str(int(current_energy / 4) * u"\u25A0"), "green") + str(int(current_energy)))
+        print("HP:     |" + colored(str(int(player.health_point // 4) * u"\u25A0"), "green") +
+              str(int(player.health_point)))
+        print("energy: |" + colored(str(int(player.energy // 4) * u"\u25A0"), "yellow") + str(int(player.energy)))
+        print("Mana:   |" + colored(str(int(player.mana_point) * ("|" + u"\u25A0" + "|")), "blue") +
+              str(int(player.mana_point)))
         print("gold: " + colored(str(current_gold), "yellow"))
         print("slot cost: " + str(slots_cost))
         print("company cost: " + str(company_cost))
-        print(currently_injured)
-        print(injureds_list)
+        print("injured: " + str(currently_injured))
+        print("injured list: " + str(injureds_list))
         print("allowed slots: " + str(allowed_slots))
+        # display_oldmap(game_map, position)
 
 
-gold, allowed_slots = crew_recruitment(gold, companions, inventory, allowed_slots)
+# gold, allowed_slots = crew_recruitment(gold, companions, inventory, allowed_slots)
 display_map(game_map, position)
+# print()
+# display_oldmap(game_map, position)
 print(" ~~ WELCOME TO THE PECULIAR EXPEDITION ~~ ")
 print("Above you can see the map. Your current location is always highlighted with yellow.")
-move(game_map, energy, gold, position, companions, inventory, company_cost, EC, slots, vendor, injured, injured_list)
+move(game_map, player.energy, player.gold, position, player.companions, inventory, company_cost, EC, slots, injured,
+     injured_list, sight)
