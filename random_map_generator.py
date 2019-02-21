@@ -3,10 +3,30 @@
 
 
 # from termcolor import colored
+from OOP_terrains import Village
 import random
 
-# This is the list table for the map. 16 rows and 16 columns
-game_map = [
+
+game_map = [  # This is the list table for the map. 16 rows and 16 columns
+    ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"],
+    ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"],
+    ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"],
+    ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"],
+    ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"],
+    ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"],
+    ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"],
+    ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"],
+    ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"],
+    ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"],
+    ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"],
+    ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"],
+    ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"],
+    ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"],
+    ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"],
+    ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"],
+]
+
+fog_map = [  # This is the list table for the fog. 16 rows and 16 columns
     ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"],
     ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"],
     ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"],
@@ -40,10 +60,39 @@ P_position = []  # contains the integer coordinates of the Pyramid (P) element i
 
 position = [0, 0]  # contains the integer coordinates of the current position on the map. : [row_index, column index]
 
+sight = [0, 1]
+
 
 for row_index, row in enumerate(game_map):  # <- with the enumerate, I get the indexes
     for column_index, column in enumerate(row):  # <- with the enumerate, I get the indexes
         map_coordinates.append([row_index, column_index])  # filling up the map_coordinates list with coordinates.
+
+
+def fog():
+    fog_map[position[0]][position[1]] = "!"
+
+    for num1 in sight:
+        for num2 in sight:
+
+            try:
+                fog_map[position[0] + num1][position[1] + num2] = "!"
+            except IndexError:
+                pass
+
+            try:
+                fog_map[position[0] + num1][abs(position[1] - num2)] = "!"
+            except IndexError:
+                pass
+
+            try:
+                fog_map[abs(position[0] - num1)][position[1] + num2] = "!"
+            except IndexError:
+                pass
+
+            try:
+                fog_map[abs(position[0] - num1)][abs(position[1] - num2)] = "!"
+            except IndexError:
+                pass
 
 
 def t_c_terrain(current_map):
@@ -255,14 +304,14 @@ def v_terrain(current_map):
                             current_map[map_coordinates[x][0] + 1][map_coordinates[x][1]] = "V"
                             V_locations.append([map_coordinates[x][0] + 1, map_coordinates[x][1]])
                         elif y == 2:
-                            current_map[map_coordinates[x][0] - 1][map_coordinates[x][1]] = "V"
-                            V_locations.append([map_coordinates[x][0] - 1, map_coordinates[x][1]])
+                            current_map[abs(map_coordinates[x][0] - 1)][map_coordinates[x][1]] = "V"
+                            V_locations.append([abs(map_coordinates[x][0] - 1), map_coordinates[x][1]])
                         elif y == 3:
                             current_map[map_coordinates[x][0]][map_coordinates[x][1] + 1] = "V"
                             V_locations.append([map_coordinates[x][0], map_coordinates[x][1] + 1])
                         elif y == 4:
-                            current_map[map_coordinates[x][0]][map_coordinates[x][1] - 1] = "V"
-                            V_locations.append([map_coordinates[x][0], map_coordinates[x][1] - 1])
+                            current_map[map_coordinates[x][0]][abs(map_coordinates[x][1] - 1)] = "V"
+                            V_locations.append([map_coordinates[x][0], abs(map_coordinates[x][1] - 1)])
 
                     except IndexError:
                         # if the coordinate is out of coordinates
@@ -302,20 +351,20 @@ def h_terrain(current_map):
                             current_map[map_coordinates[x][0] + 2][map_coordinates[x][1]] = "H"
                             H_locations.append([map_coordinates[x][0] + 2, map_coordinates[x][1]])
                         elif y == 2:
-                            current_map[map_coordinates[x][0] - 1][map_coordinates[x][1]] = "H"
-                            H_locations.append([map_coordinates[x][0] - 1, map_coordinates[x][1]])
-                            current_map[map_coordinates[x][0] - 2][map_coordinates[x][1]] = "H"
-                            H_locations.append([map_coordinates[x][0] - 2, map_coordinates[x][1]])
+                            current_map[abs(map_coordinates[x][0] - 1)][map_coordinates[x][1]] = "H"
+                            H_locations.append([abs(map_coordinates[x][0] - 1), map_coordinates[x][1]])
+                            current_map[abs(map_coordinates[x][0] - 2)][map_coordinates[x][1]] = "H"
+                            H_locations.append([abs(map_coordinates[x][0] - 2), map_coordinates[x][1]])
                         elif y == 3:
                             current_map[map_coordinates[x][0]][map_coordinates[x][1] + 1] = "H"
                             H_locations.append([map_coordinates[x][0], map_coordinates[x][1] + 1])
                             current_map[map_coordinates[x][0]][map_coordinates[x][1] + 2] = "H"
                             H_locations.append([map_coordinates[x][0], map_coordinates[x][1] + 2])
                         elif y == 4:
-                            current_map[map_coordinates[x][0]][map_coordinates[x][1] - 1] = "H"
-                            H_locations.append([map_coordinates[x][0], map_coordinates[x][1] - 1])
-                            current_map[map_coordinates[x][0]][map_coordinates[x][1] - 2] = "H"
-                            H_locations.append([map_coordinates[x][0], map_coordinates[x][1] - 2])
+                            current_map[map_coordinates[x][0]][abs(map_coordinates[x][1] - 1)] = "H"
+                            H_locations.append([map_coordinates[x][0], abs(map_coordinates[x][1] - 1)])
+                            current_map[map_coordinates[x][0]][abs(map_coordinates[x][1] - 2)] = "H"
+                            H_locations.append([map_coordinates[x][0], abs(map_coordinates[x][1] - 2)])
 
                     except IndexError:
                         pass

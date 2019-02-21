@@ -6,7 +6,9 @@
 
 import random
 
-from village_and_companions import company, shaman_out, soldier_out, donkey_out
+from OOP_village import company, donkey_out, scout_out, shaman_out, soldier_out
+from OOP_player import player
+
 
 from GAME_displays import display_curse_geyser
 from GAME_displays import display_curse_volcano
@@ -25,8 +27,8 @@ from GAME_displays import display_shrine
 
 
 o_coordinate = []  # coordinates of the Shrine we are currently in.
-L_coordinate = []  # types and coordinates of terrains that are being changed to L
-Volcano_coordinate = []  # coordinates of H-s being changed to @ (volcanos)
+L_coordinate = []  # types and coordinates of terrains that are being changed to lava (L)
+Volcano_coordinate = []  # coordinates of H-s being changed to volcanos (@)
 S_coordinate = []  # contains the coordinates of already visited Shrines
 B_coordinate = []  # contains the coordinates of already visited Caves
 
@@ -364,12 +366,12 @@ injured_list = {}
 injured = False
 
 
-def injury(current_companions, current_inventory, max_slots):
+def injury(current_companions, current_inventory, max_slots, scout_sight):
     #  one companion from the injured list leaves the group. if there is no more companion in the injured list, it sets
     #  the injured variable value to False.
     y = random.choice(list(injured_list))
     input("Your " + y + " companion got enough of your journeys! He leaves the group because of his injuries.")
-    current_companions.pop(y, None)
+    del player.companions[y]
     injured_list.pop(y, None)
     companion_cost = company(current_companions)
 
@@ -380,7 +382,7 @@ def injury(current_companions, current_inventory, max_slots):
         pass
 
     if y == "scout":
-        pass
+        scout_out(scout_sight)
 
     if y == "donkey":
         max_slots = donkey_out(max_slots)

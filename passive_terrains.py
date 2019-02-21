@@ -1,6 +1,11 @@
 # THIS FILE CONTAINS:
 # Functions for terrain types that have no interactive interface
 
+import random
+from OOP_player import fight
+from OOP_monsters import Troll, Tiger
+from GAME_displays import display_troll, display_tiger
+
 
 def dot(current_energy, current_companions, current_inventory, slot_cost, companions_cost):
     # only burns energy to move on it if there are more items in the inventory than allowed,
@@ -27,6 +32,12 @@ def dot_wet(current_energy, move_cost, slot_cost, companions_cost):
 
 def r(current_energy, move_cost, slot_cost, companions_cost):
     # burns energy
+    fight_chance = random.randint(1, 100)
+    if fight_chance <= 3:
+        tiger = Tiger()
+        display_tiger()
+        input("A Prowling Tiger attacked you!")
+        fight(tiger)
     current_energy -= (move_cost * 1.4) * slot_cost * companions_cost
     return current_energy
 
@@ -40,6 +51,12 @@ def r_wet(current_energy, move_cost, slot_cost, companions_cost):
 def j(current_energy, current_map, current_position, current_inventory, move_cost, slot_cost, companions_cost,
       def_slot):
     # Jungle: use up a machete to turn it to plain ground. Else it burns more energy.
+    fight_chance = random.randint(1, 100)
+    if fight_chance <= 3:
+        troll = Troll()
+        display_troll()
+        input("A jungle Troll attacked you!")
+        fight(troll)
     if "machete" in current_inventory:
         if current_inventory["machete"][0] >= 1:
             current_inventory["machete"][0] -= 1
