@@ -1,11 +1,13 @@
 import random
 import time
+from termcolor import colored
 
 weapons = [
     ["sword", 1, 5],
     ["axe", 5, 10],
     ["mace", 10, 15]
 ]
+
 
 class Monster:
 
@@ -14,14 +16,14 @@ class Monster:
         self.name = name
         self._lives = lives
         self.health_point = health_point
-        self._weapon = random.choice(weapons)
+        self.weapon = random.choice(weapons)
         self.alive = True
 
     def take_dmg(self, dmg):
         remaining_hp = self.health_point - dmg
         if remaining_hp > 0:
             self.health_point -= dmg
-            print(self.name + " took " + str(dmg) + " damage")
+            print(self.name + " took " + colored(str(dmg), "red") + " damage")
         else:
             self.health_point = 0
             self.alive = False
@@ -35,9 +37,9 @@ class Monster:
 
     def deal_dmg(self, player):
         if self.alive:
-            print(self.name + " is swinging his " + self._weapon[0] + " at you!")
+            print(self.name + " is swinging his " + self.weapon[0] + " at you!")
             time.sleep(2.5)
-            player.take_dmg(random.randint(self._weapon[1], self._weapon[2]))
+            player.take_dmg(random.randint(self.weapon[1], self.weapon[2]))
 
     def __str__(self):
         return "Race: {0._race}, Name: {0._name}, Lives: {0._lives} HP: {0._health_point}, " \
@@ -57,7 +59,7 @@ class Tiger(Monster):
 
     def take_dmg(self, dmg):
         if random.randint(1, 10) <= 4:
-            print("***** " + self.name + "Dodges *****")
+            print("***** " + self.name + " Dodges *****")
         else:
             remaining_hp = self.health_point - dmg
             if remaining_hp > 0:
@@ -70,8 +72,12 @@ class Tiger(Monster):
 
     def deal_dmg(self, player):
         if self.alive:
-            print(self.name + " is biting you")
-            time.sleep(2.5)
-            player.take_dmg(random.randint(4, 8))
-
-
+            bite_or_claw = random.randint(1, 2)
+            if bite_or_claw == 1:
+                print(self.name + " is biting you")
+                time.sleep(2.5)
+                player.take_dmg(random.randint(6, 12))
+            else:
+                print(self.name + " is clawing you")
+                time.sleep(2.5)
+                player.take_dmg(random.randint(4, 8))

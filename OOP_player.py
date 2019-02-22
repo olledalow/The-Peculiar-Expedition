@@ -1,18 +1,12 @@
 import random
-from OOP_monsters import Monster, Troll
 from copy import copy
-from OOP_village import Whiskey, Chocolate, Fruit, Meat, Medicine, villagers, crew, Vendor
-from GAME_displays import display_bag, display_merchant
+from OOP_village_items import Whiskey, Chocolate, Fruit, Meat, Medicine, Torch, Rope
+from OOP_displays import display_bag
 from termcolor import colored
 import time
 
 
 class Player:
-
-    '''
-    energy: starting gold
-    gold: used for steps (movement), may also decrease when catastrophe happens. displayed as green u"\u25A0" bar
-    '''
 
     def __init__(self, name):
         self.name = name
@@ -20,29 +14,20 @@ class Player:
         self.gold = 250
         self.inventory = Inventory()
         self.companions = {}
+        self.injured = False
+        self.injured_companions = {}
         self._lives = 3
         self.health_point = 100
         self.mana_point = 5
         self.alive = True
         self.position = [0, 0]
+        self.sight = [0, 1]
 
     def get_lives(self):
         return self._lives
 
     def get_hp(self):
         return self.health_point
-
-    def add_companion(self, companion):
-        if len(self.companions) >= 3:
-            print("You cannot have more than 3 companions at a time")
-        else:
-            if companion in ["scout", "shaman", "wise"]:
-                self.companions[companion] = villagers[companion]
-                del villagers[companion]
-
-            if companion in ["trader", "soldier", "donkey"]:
-                self.companions[companion] = crew[companion]
-                del crew[companion]
 
     def lose_companion(self, companion):
         del self.companions[companion]
@@ -51,7 +36,8 @@ class Player:
         remaining_hp = self.health_point - dmg
         if remaining_hp > 0:
             self.health_point -= dmg
-            print("Ouch, " + self.name + " took " + str(dmg) + " damage and got " + str(self.health_point) + "hp left")
+            print("Ouch, " + self.name + " took " + colored(str(dmg), "red") + "damage")
+            time.sleep(2.5)
         else:
             self.health_point = 0
             self.alive = False
@@ -60,12 +46,13 @@ class Player:
         while True:
             attack = input("type 'sword' for a melee attack or 'firebolt' for spellcasting")
             if attack == "firebolt":
-                print(self.name + "is casting a firebolt")
+                print(self.name + " is casting a firebolt")
                 time.sleep(2.5)
                 enemy.take_dmg(self.firebolt())
+                time.sleep(2.5)
                 break
             elif attack == "sword":
-                print(self.name + "is swinging his sword")
+                print(self.name + " is swinging his sword")
                 time.sleep(2.5)
                 enemy.take_dmg(self.sword())
                 time.sleep(2.5)
@@ -79,6 +66,7 @@ class Player:
             print("Not enough mana!")
 
     def sword(self):
+        self.energy -= 3
         return random.randint(3, 8)
 
     def display_inventory(self):
@@ -92,7 +80,7 @@ class Player:
             print(str(len(self.inventory.contents)) + " out of " + str(self.inventory.slot_limit) + ". You have " +
                   str(self.inventory.slot_limit - len(self.inventory.contents)) + " free slots left.")
         for e in self.inventory.contents:
-            print(e)  # print inventory elements if have any of it.
+            print(str(e) + e.usage)  # print inventory elements if have any of it.
 
         if "soldier" in self.companions:
             print("Because you have a Soldier companion, you get extra 20% energy when drinking whiskey")
@@ -164,6 +152,13 @@ class Player:
                 except ValueError:
                     print("Enter a valid number!")
 
+    def injury(self):
+        companion = random.choice(self.injured_companions)
+        print("Your " + companion + " can't keep up because of his injuries. He leaves your group!")
+        del self.injured_companions[companion]
+        if len(self.injured_companions) == 0:
+            self.injured = False
+
     def __str__(self):
         return self.name + "   " + str(self.energy) + " energy   " + str(self.gold) + " gold   inv:" \
                + str(self.inventory.contents)
@@ -173,7 +168,7 @@ class Inventory:
     def __init__(self):
         self.stack_limit = 10
         self.slot_limit = 8
-        self.contents = [Whiskey(5), Meat(5), Fruit(5), Medicine(5), Chocolate(5)]
+        self.contents = [Whiskey(5), Meat(5), Rope(2), Torch(2)]
 
     def add_item(self, it):
         item = copy(it)
@@ -238,13 +233,27 @@ class Inventory:
             return False
 
 
-player = Player("Endron")
-print(player.name, player.health_point, "hp")
+def scout():
+    player.sight.append(2)
+
+
+def scout_out():
+    player.sight.remove(2)
+
+
+def donkey():
+    # If donkey chosen as companion, increase inventory slots
+    player.inventory.slot_limit += 2
+
+
+def donkey_out():
+    # If donkey leaves the group, change back inventory slots to original
+    player.inventory.slot_limit -= 2
 
 
 def fight(enemy):
 
-    while player.alive and enemy.alive:
+    while player.alive and enemy.alive and player.energy > 0:
         print("\n" * 30)
         print("     Endron:                                            " + enemy.name + ":")
         print("     min _________________________ max                  min _________________________ max")
@@ -256,5 +265,8 @@ def fight(enemy):
             int(player.mana_point)))
 
         player.deal_dmg(enemy)
-        time.sleep(2.5)
         enemy.deal_dmg(player)
+
+
+player = Player("Endron")
+print(player.name, player.health_point, "hp")
