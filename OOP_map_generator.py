@@ -3,9 +3,18 @@ from OOP_terrains import Sea, Ship, Village, Lake, Pyramid, Mountain, Meadow, Ju
 from termcolor import colored
 from OOP_map_position import game_map, fog_map
 from OOP_player import player
+import os
+
+######################################################################################################
+#  TERMINAL ASCII MAP:
+
+
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 
 map_coordinates = []  # contains the integer coordinates of the map elements in lists. : [row_index, column index]
+map_copy = []  # copy of map_coordinates
 village_locations = []  # contains the integer coordinates of the village (F) elements in lists. :
 lake_locations = []  # contains the integer coordinates of the Lake (V) elements in lists. : [row_index, column index]
 pyramid_position = [0, 0]  # contains the integer coordinates of the Pyramid (P) element in lists. :
@@ -13,9 +22,11 @@ mountain_locations = []  # contains the integer coordinates of the Mountain (H) 
 altar_locations = []  # contains the integer coordinates of the Shrine (O) elements in lists. :
 
 
-for row_index, row in enumerate(game_map):  # <- with the enumerate, I get the indexes
-    for column_index, column in enumerate(row):  # <- with the enumerate, I get the indexes
-        map_coordinates.append([row_index, column_index])  # filling up the map_coordinates list with coordinates.
+def get_map_coordinates():
+    for row_index, row in enumerate(game_map):  # <- with the enumerate, I get the indexes
+        for column_index, column in enumerate(row):  # <- with the enumerate, I get the indexes
+            map_coordinates.append([row_index, column_index])  # filling up the map_coordinates list with coordinates.
+            map_copy.append([row_index, column_index])
 
 
 def sea_ship():
@@ -25,13 +36,13 @@ def sea_ship():
 
     if sea_side == 1:
         for number in range(16):
-            game_map[number][0] = Sea()
+            game_map[number][0] = Sea(coordinate=(number, 0))
             for e in map_coordinates:  # COORDINATE DELETION
                 if e == [number, 0]:
                     map_coordinates.remove([number, 0])
 
             if game_map[number][1] == game_map[boat][1]:
-                game_map[boat][1] = Ship()
+                game_map[boat][1] = Ship(coordinate=(boat, 1))
                 player.position = [boat, 1]
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [boat, 1]:
@@ -39,34 +50,34 @@ def sea_ship():
 
             t1 = random.randint(1, 100)
             if t1 < 85 and game_map[number][1] != Ship():
-                game_map[number][1] = Sea()
+                game_map[number][1] = Sea(coordinate=(number, 1))
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [number, 1]:
                         map_coordinates.remove([number, 1])
 
             t2 = random.randint(1, 100)
             if t2 < 75 and game_map[number][1] == Sea():
-                game_map[number][2] = Sea()
+                game_map[number][2] = Sea(coordinate=(number, 2))
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [number, 2]:
                         map_coordinates.remove([number, 2])
 
             t3 = random.randint(1, 100)
             if t3 < 50 and game_map[number][2] == Sea():
-                game_map[number][3] = Sea()
+                game_map[number][3] = Sea(coordinate=(number, 3))
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [number, 3]:
                         map_coordinates.remove([number, 3])
 
     elif sea_side == 2:
         for number in range(16):
-            game_map[0][number] = Sea()
+            game_map[0][number] = Sea(coordinate=(0, number))
             for e in map_coordinates:  # COORDINATE DELETION
                 if e == [0, number]:
                     map_coordinates.remove([0, number])
 
             if game_map[1][number] == game_map[1][boat]:
-                game_map[1][boat] = Ship()
+                game_map[1][boat] = Ship(coordinate=(1, boat))
                 player.position = [1, boat]
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [1, boat]:
@@ -74,34 +85,34 @@ def sea_ship():
 
             t1 = random.randint(1, 101)
             if t1 < 85 and game_map[1][number] != Ship():
-                game_map[1][number] = Sea()
+                game_map[1][number] = Sea(coordinate=(1, number))
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [1, number]:
                         map_coordinates.remove([1, number])
 
             t2 = random.randint(1, 101)
             if t2 < 75 and game_map[1][number] == Sea():
-                game_map[2][number] = Sea()
+                game_map[2][number] = Sea(coordinate=(2, number))
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [2, number]:
                         map_coordinates.remove([2, number])
 
             t3 = random.randint(1, 101)
             if t3 < 50 and game_map[2][number] == Sea():
-                game_map[3][number] = Sea()
+                game_map[3][number] = Sea(coordinate=(3, number))
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [3, number]:
                         map_coordinates.remove([3, number])
 
     elif sea_side == 3:
         for number in range(16):
-            game_map[15][number] = Sea()
+            game_map[15][number] = Sea(coordinate=(15, number))
             for e in map_coordinates:  # COORDINATE DELETION
                 if e == [15, number]:
                     map_coordinates.remove([15, number])
 
             if game_map[14][number] == game_map[14][boat]:
-                game_map[14][boat] = Ship()
+                game_map[14][boat] = Ship(coordinate=(14, boat))
                 player.position = [14, boat]
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [14, boat]:
@@ -109,34 +120,34 @@ def sea_ship():
 
             t1 = random.randint(1, 101)
             if t1 < 85 and game_map[14][number] != Ship():
-                game_map[14][number] = Sea()
+                game_map[14][number] = Sea(coordinate=(14, number))
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [14, number]:
                         map_coordinates.remove([14, number])
 
             t2 = random.randint(1, 101)
             if t2 < 75 and game_map[14][number] == Sea():
-                game_map[13][number] = Sea()
+                game_map[13][number] = Sea(coordinate=(13, number))
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [13, number]:
                         map_coordinates.remove([13, number])
 
             t3 = random.randint(1, 101)
             if t3 < 50 and game_map[13][number] == Sea():
-                game_map[12][number] = Sea()
+                game_map[12][number] = Sea(coordinate=(12, number))
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [12, number]:
                         map_coordinates.remove([12, number])
 
     elif sea_side == 4:
         for number in range(16):
-            game_map[number][15] = Sea()
+            game_map[number][15] = Sea(coordinate=(number, 15))
             for e in map_coordinates:  # COORDINATE DELETION
                 if e == [number, 15]:
                     map_coordinates.remove([number, 15])
 
             if game_map[number][14] == game_map[boat][14]:
-                game_map[boat][14] = Ship()
+                game_map[boat][14] = Ship(coordinate=(boat, 14))
                 player.position = [boat, 14]
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [boat, 14]:
@@ -144,21 +155,21 @@ def sea_ship():
 
             t1 = random.randint(1, 101)
             if t1 < 85 and game_map[number][14] != Ship():
-                game_map[number][14] = Sea()
+                game_map[number][14] = Sea(coordinate=(number, 14))
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [number, 14]:
                         map_coordinates.remove([number, 14])
 
             t2 = random.randint(1, 101)
             if t2 < 75 and game_map[number][14] == Sea():
-                game_map[number][13] = Sea()
-                for e in map_coordinates:  # COORDINATE DELETION
+                game_map[number][13] = Sea(coordinate=(number, 13))
+                for e in map_coordinates:  # COORDINATE DELETIONcoordinate=(boat, 1)
                     if e == [number, 13]:
                         map_coordinates.remove([number, 13])
 
             t3 = random.randint(1, 101)
             if t3 < 50 and game_map[number][13] == Sea():
-                game_map[number][12] = Sea()
+                game_map[number][12] = Sea(coordinate=(number, 12))
                 for e in map_coordinates:  # COORDINATE DELETION
                     if e == [number, 12]:
                         map_coordinates.remove([number, 12])
@@ -176,7 +187,8 @@ def village():
             continue
         else:
             if len(village_locations) == 0:
-                game_map[map_coordinates[x][0]][map_coordinates[x][1]] = Village()
+                game_map[map_coordinates[x][0]][map_coordinates[x][1]] = Village(coordinate=(map_coordinates[x][0],
+                                                                                             map_coordinates[x][1]))
                 village_locations.append([map_coordinates[x][0], map_coordinates[x][1]])
                 map_coordinates.pop(x)
                 village_number -= 1
@@ -186,7 +198,8 @@ def village():
                        (map_coordinates[x][0] + map_coordinates[x][1])) < 6:
                     continue
                 else:
-                    game_map[map_coordinates[x][0]][map_coordinates[x][1]] = Village()
+                    game_map[map_coordinates[x][0]][map_coordinates[x][1]] = Village(coordinate=(map_coordinates[x][0],
+                                                                                                 map_coordinates[x][1]))
                     village_locations.append([map_coordinates[x][0], map_coordinates[x][1]])
                     map_coordinates.pop(x)
                     village_number -= 1
@@ -198,7 +211,8 @@ def village():
                                (map_coordinates[x][0] + map_coordinates[x][1])) < 6:
                     continue
                 else:
-                    game_map[map_coordinates[x][0]][map_coordinates[x][1]] = Village()
+                    game_map[map_coordinates[x][0]][map_coordinates[x][1]] = Village(coordinate=(map_coordinates[x][0],
+                                                                                                 map_coordinates[x][1]))
                     village_locations.append([map_coordinates[x][0], map_coordinates[x][1]])
                     map_coordinates.pop(x)
                     village_number -= 1
@@ -215,30 +229,40 @@ def lake():
                 abs((pyramid_position[0] + pyramid_position[1]) - (map_coordinates[x][0] + map_coordinates[x][1])) < 6:
             continue
         else:
-            game_map[map_coordinates[x][0]][map_coordinates[x][1]] = Lake()
-            lake_locations.append([map_coordinates[x][0], map_coordinates[x][1]])
-            lake_number -= 1
+            if 15 >= map_coordinates[x][0] >= 0 and 15 >= map_coordinates[x][1] >= 0:
+                game_map[map_coordinates[x][0]][map_coordinates[x][1]] = Lake(coordinate=(map_coordinates[x][0],
+                                                                                          map_coordinates[x][1]))
+                lake_locations.append([map_coordinates[x][0], map_coordinates[x][1]])
+                lake_number -= 1
 
-            for e in range(4):
-                if random.randint(1, 10) <= 6:
-                    try:
-                        placement = random.randint(1, 4)
-                        if placement == 1:
-                            game_map[map_coordinates[x][0] + 1][map_coordinates[x][1]] = Lake()
-                            lake_locations.append([map_coordinates[x][0] + 1, map_coordinates[x][1]])
-                        elif placement == 2:
-                            game_map[abs(map_coordinates[x][0] - 1)][map_coordinates[x][1]] = Lake()
-                            lake_locations.append([abs(map_coordinates[x][0] - 1), map_coordinates[x][1]])
-                        elif placement == 3:
-                            game_map[map_coordinates[x][0]][map_coordinates[x][1] + 1] = Lake()
-                            lake_locations.append([map_coordinates[x][0], map_coordinates[x][1] + 1])
-                        elif placement == 4:
-                            game_map[map_coordinates[x][0]][abs(map_coordinates[x][1] - 1)] = Lake()
-                            lake_locations.append([map_coordinates[x][0], abs(map_coordinates[x][1] - 1)])
+                for e in range(4):
+                    if random.randint(1, 10) <= 6:
+                        try:
+                            placement = random.randint(1, 4)
+                            if placement == 1:
+                                if 15 >= map_coordinates[x][0]+1 >= 0:
+                                    game_map[map_coordinates[x][0] + 1][map_coordinates[x][1]] = \
+                                        Lake(coordinate=(map_coordinates[x][0]+1, map_coordinates[x][1]))
+                                    lake_locations.append([map_coordinates[x][0] + 1, map_coordinates[x][1]])
+                            elif placement == 2:
+                                if 15 >= map_coordinates[x][0] - 1 >= 0:
+                                    game_map[map_coordinates[x][0] - 1][map_coordinates[x][1]] = \
+                                        Lake(coordinate=(map_coordinates[x][0]-1, map_coordinates[x][1]))
+                                    lake_locations.append([map_coordinates[x][0] - 1, map_coordinates[x][1]])
+                            elif placement == 3:
+                                if 15 >= map_coordinates[x][1] + 1 >= 0:
+                                    game_map[map_coordinates[x][0]][map_coordinates[x][1] + 1] = \
+                                        Lake(coordinate=(map_coordinates[x][0], map_coordinates[x][1]+1))
+                                    lake_locations.append([map_coordinates[x][0], map_coordinates[x][1] + 1])
+                            elif placement == 4:
+                                if 15 >= map_coordinates[x][1] - 1 >= 0:
+                                    game_map[map_coordinates[x][0]][map_coordinates[x][1] - 1] = \
+                                        Lake(coordinate=(map_coordinates[x][0], map_coordinates[x][1]-1))
+                                    lake_locations.append([map_coordinates[x][0], map_coordinates[x][1] - 1])
 
-                    except IndexError:
-                        # if the coordinate is out of coordinates
-                        pass
+                        except IndexError:
+                            # if the coordinate is out of coordinates
+                            pass
 
     for e in lake_locations:
         try:
@@ -258,7 +282,8 @@ def pyramid():
         if abs((player.position[0] + player.position[1]) - (map_coordinates[x][0] + map_coordinates[x][1])) < 14:
             continue
         else:
-            game_map[map_coordinates[x][0]][map_coordinates[x][1]] = Pyramid()
+            game_map[map_coordinates[x][0]][map_coordinates[x][1]] = Pyramid(coordinate=(map_coordinates[x][0],
+                                                                                         map_coordinates[x][1]))
             pyramid_position = [map_coordinates[x][0], map_coordinates[x][1]]
             map_coordinates.pop(x)
             p_number -= 1
@@ -275,37 +300,70 @@ def mountain():
                 abs((pyramid_position[0] + pyramid_position[1]) - (map_coordinates[x][0] + map_coordinates[x][1])) < 6:
             continue
         else:
-            game_map[map_coordinates[x][0]][map_coordinates[x][1]] = Mountain()
-            mountain_locations.append([map_coordinates[x][0], map_coordinates[x][1]])
-            mountain_number -= 1
+            if (15 >= map_coordinates[x][0] >= 0) and (15 >= map_coordinates[x][1] >= 0):
+                game_map[map_coordinates[x][0]][map_coordinates[x][1]] = Mountain(coordinate=(map_coordinates[x][0],
+                                                                                  map_coordinates[x][1]))
+                mountain_locations.append([map_coordinates[x][0], map_coordinates[x][1]])
+                mountain_number -= 1
 
-            for e in range(5):
-                if random.randint(1, 10) <= 4:
-                    try:
-                        placement = random.randint(1, 4)
-                        if placement == 1:
-                            game_map[map_coordinates[x][0] + 1][map_coordinates[x][1]] = Mountain()
-                            mountain_locations.append([map_coordinates[x][0] + 1, map_coordinates[x][1]])
-                            game_map[map_coordinates[x][0] + 2][map_coordinates[x][1]] = Mountain()
-                            mountain_locations.append([map_coordinates[x][0] + 2, map_coordinates[x][1]])
-                        elif placement == 2:
-                            game_map[abs(map_coordinates[x][0] - 1)][map_coordinates[x][1]] = Mountain()
-                            mountain_locations.append([abs(map_coordinates[x][0] - 1), map_coordinates[x][1]])
-                            game_map[abs(map_coordinates[x][0] - 2)][map_coordinates[x][1]] = Mountain()
-                            mountain_locations.append([abs(map_coordinates[x][0] - 2), map_coordinates[x][1]])
-                        elif placement == 3:
-                            game_map[map_coordinates[x][0]][map_coordinates[x][1] + 1] = Mountain()
-                            mountain_locations.append([map_coordinates[x][0], map_coordinates[x][1] + 1])
-                            game_map[map_coordinates[x][0]][map_coordinates[x][1] + 2] = Mountain()
-                            mountain_locations.append([map_coordinates[x][0], map_coordinates[x][1] + 2])
-                        elif placement == 4:
-                            game_map[map_coordinates[x][0]][abs(map_coordinates[x][1] - 1)] = Mountain()
-                            mountain_locations.append([map_coordinates[x][0], abs(map_coordinates[x][1] - 1)])
-                            game_map[map_coordinates[x][0]][abs(map_coordinates[x][1] - 2)] = Mountain()
-                            mountain_locations.append([map_coordinates[x][0], abs(map_coordinates[x][1] - 2)])
+                for e in range(5):
+                    if random.randint(1, 10) <= 4:
+                        try:
+                            placement = random.randint(1, 4)
+                            if placement == 1:
+                                if 15 >= map_coordinates[x][0]+1 >= 0:
+                                    game_map[map_coordinates[x][0] + 1][map_coordinates[x][1]] = \
+                                        Mountain(coordinate=(map_coordinates[x][0]+1, map_coordinates[x][1]))
 
-                    except IndexError:
-                        pass
+                                    mountain_locations.append([map_coordinates[x][0] + 1, map_coordinates[x][1]])
+
+                                if 15 >= map_coordinates[x][0]+2 >= 0:
+                                    game_map[map_coordinates[x][0] + 2][map_coordinates[x][1]] = \
+                                        Mountain(coordinate=(map_coordinates[x][0]+2, map_coordinates[x][1]))
+
+                                    mountain_locations.append([map_coordinates[x][0] + 2, map_coordinates[x][1]])
+
+                            elif placement == 2:
+                                if 15 >= map_coordinates[x][0]-1 >= 0:
+                                    game_map[map_coordinates[x][0] - 1][map_coordinates[x][1]] = \
+                                        Mountain(coordinate=(map_coordinates[x][0]-1, map_coordinates[x][1]))
+
+                                    mountain_locations.append([map_coordinates[x][0] - 1, map_coordinates[x][1]])
+
+                                if 15 >= map_coordinates[x][0]-2 >= 0:
+                                    game_map[map_coordinates[x][0] - 2][map_coordinates[x][1]] = \
+                                        Mountain(coordinate=(map_coordinates[x][0]-2, map_coordinates[x][1]))
+
+                                    mountain_locations.append([map_coordinates[x][0] - 2, map_coordinates[x][1]])
+
+                            elif placement == 3:
+                                if 15 >= map_coordinates[x][1]+1 >= 0:
+                                    game_map[map_coordinates[x][0]][map_coordinates[x][1] + 1] = \
+                                        Mountain(coordinate=(map_coordinates[x][0], map_coordinates[x][1]+1))
+
+                                    mountain_locations.append([map_coordinates[x][0], map_coordinates[x][1] + 1])
+
+                                if 15 >= map_coordinates[x][1]+2 >= 0:
+                                    game_map[map_coordinates[x][0]][map_coordinates[x][1] + 2] = \
+                                        Mountain(coordinate=(map_coordinates[x][0], map_coordinates[x][1]+2))
+
+                                    mountain_locations.append([map_coordinates[x][0], map_coordinates[x][1] + 2])
+
+                            elif placement == 4:
+                                if 15 >= map_coordinates[x][1]-1 >= 0:
+                                    game_map[map_coordinates[x][0]][map_coordinates[x][1] - 1] = \
+                                        Mountain(coordinate=(map_coordinates[x][0], map_coordinates[x][1]-1))
+
+                                    mountain_locations.append([map_coordinates[x][0], map_coordinates[x][1] - 1])
+
+                                if 15 >= map_coordinates[x][1]-2 >= 0:
+                                    game_map[map_coordinates[x][0]][map_coordinates[x][1] - 2] = \
+                                        Mountain(coordinate=(map_coordinates[x][0], map_coordinates[x][1]-2))
+
+                                    mountain_locations.append([map_coordinates[x][0], map_coordinates[x][1] - 2])
+
+                        except IndexError:
+                            pass
 
     for e in mountain_locations:
         try:
@@ -320,13 +378,13 @@ def meadow_jungle_thicket():
     for e in map_coordinates:
         choice = random.randint(1, 3)
         if choice == 1:
-            game_map[e[0]][e[1]] = Meadow()
+            game_map[e[0]][e[1]] = Meadow(coordinate=(e[0], e[1]))
 
         elif choice == 2:
-            game_map[e[0]][e[1]] = Jungle()
+            game_map[e[0]][e[1]] = Jungle(coordinate=(e[0], e[1]))
 
         elif choice == 3:
-            game_map[e[0]][e[1]] = Thicket()
+            game_map[e[0]][e[1]] = Thicket(coordinate=(e[0], e[1]))
 
 
 def wet_terrain():
@@ -346,14 +404,14 @@ def wet_terrain():
             continue
 
         try:
-            if game_map[e[0] - 1][e[1]].icon in "RJ.":
+            if e[0] > 0 and game_map[e[0] - 1][e[1]].icon in "RJ.":
                 game_map[e[0] - 1][e[1]].wet = True
                 game_map[e[0] - 1][e[1]].if_wet()
         except IndexError:
             continue
 
         try:
-            if game_map[e[0] - 1][e[1] - 1].icon in "RJ.":
+            if e[0] > 0 and e[1] > 0 and game_map[e[0] - 1][e[1] - 1].icon in "RJ.":
                 game_map[e[0] - 1][e[1] - 1].wet = True
                 game_map[e[0] - 1][e[1] - 1].if_wet()
         except IndexError:
@@ -367,21 +425,21 @@ def wet_terrain():
             continue
 
         try:
-            if game_map[e[0] - 1][e[1] + 1].icon in "RJ.":
+            if e[0] > 0 and game_map[e[0] - 1][e[1] + 1].icon in "RJ.":
                 game_map[e[0] - 1][e[1] + 1].wet = True
                 game_map[e[0] - 1][e[1] + 1].if_wet()
         except IndexError:
             continue
 
         try:
-            if game_map[e[0]][e[1] - 1].icon in "RJ.":
+            if e[1] > 0 and game_map[e[0]][e[1] - 1].icon in "RJ.":
                 game_map[e[0]][e[1] - 1].wet = True
                 game_map[e[0]][e[1] - 1].if_wet()
         except IndexError:
             continue
 
         try:
-            if game_map[e[0] + 1][e[1] - 1].icon in "RJ.":
+            if e[1] > 0 and game_map[e[0] + 1][e[1] - 1].icon in "RJ.":
                 game_map[e[0] + 1][e[1] - 1].wet = True
                 game_map[e[0] + 1][e[1] - 1].if_wet()
         except IndexError:
@@ -401,7 +459,8 @@ def altar():
 
         else:
             if len(altar_locations) == 0:
-                game_map[map_coordinates[x][0]][map_coordinates[x][1]] = Altar()
+                game_map[map_coordinates[x][0]][map_coordinates[x][1]] = \
+                    Altar(coordinate=(map_coordinates[x][0], map_coordinates[x][1]))
                 altar_locations.append([map_coordinates[x][0], map_coordinates[x][1]])
                 map_coordinates.pop(x)
                 altar_number -= 1
@@ -412,7 +471,8 @@ def altar():
                     continue
 
                 else:
-                    game_map[map_coordinates[x][0]][map_coordinates[x][1]] = Altar()
+                    game_map[map_coordinates[x][0]][map_coordinates[x][1]] = \
+                        Altar(coordinate=(map_coordinates[x][0], map_coordinates[x][1]))
                     altar_locations.append([map_coordinates[x][0], map_coordinates[x][1]])
                     map_coordinates.pop(x)
                     altar_number -= 1
@@ -425,7 +485,8 @@ def altar():
                     continue
 
                 else:
-                    game_map[map_coordinates[x][0]][map_coordinates[x][1]] = Altar()
+                    game_map[map_coordinates[x][0]][map_coordinates[x][1]] = \
+                        Altar(coordinate=(map_coordinates[x][0], map_coordinates[x][1]))
                     altar_locations.append([map_coordinates[x][0], map_coordinates[x][1]])
                     map_coordinates.pop(x)
                     altar_number -= 1
@@ -443,16 +504,16 @@ def sanctuary():
         if game_map[z[0]][z[1]] == Sanctuary():
             continue
         else:
-            game_map[z[0]][z[1]] = Sanctuary()
+            game_map[z[0]][z[1]] = Sanctuary(coordinate=(z[0], z[1]))
             sanctuary_number -= 1
             mountain_locations.remove(z)
 
     for e in mountain_locations:
         try:
             map_coordinates.remove(e)
+            pass
         except ValueError:
             pass
-
 
 def cave():
     global mountain_locations
@@ -466,7 +527,7 @@ def cave():
         if game_map[z[0]][z[1]] == Cave():
             continue
         else:
-            game_map[z[0]][z[1]] = Cave()
+            game_map[z[0]][z[1]] = Cave(coordinate=(z[0], z[1]))
             cave_number -= 1
             mountain_locations.remove(z)
 
@@ -507,8 +568,9 @@ def fog():
 def display_map():
     # Displays the map with the current location after every move
     # fog(fog_map)
-    print("\n" * 30)
-    fog()
+    # print("\n" * 30)
+    # clear_screen()
+    # fog()
     for ROW_INDEX, ROW in enumerate(game_map):  # <- with the enumerate, I can print the indexes
         for COLUMN_INDEX, COLUMN in enumerate(ROW):  # <- with the enumerate, I can print the indexes
             if ROW_INDEX == player.position[0] and COLUMN_INDEX == player.position[1]:
@@ -523,7 +585,7 @@ def display_map():
                     if COLUMN.icon == "P":
                         print(colored(COLUMN.icon + " ", "yellow"), end="")
                     if COLUMN.icon in "HSBFO":
-                        print(colored(COLUMN.icon + " ", "grey"), end="")
+                        print(colored(COLUMN.icon + " ", "white"), end="")
                     if COLUMN.icon in ".JR":
                         if COLUMN.wet:
                             print(colored(COLUMN.icon + " ", "cyan"), end="")
@@ -547,13 +609,34 @@ def display_map():
         print()
 
 
-sea_ship()
-pyramid()
-lake()
-mountain()
-village()
-altar()
-sanctuary()
-cave()
-meadow_jungle_thicket()
-wet_terrain()
+def generate_map():
+    get_map_coordinates()
+    sea_ship()
+    pyramid()
+    lake()
+    mountain()
+    village()
+    altar()
+    sanctuary()
+    cave()
+    meadow_jungle_thicket()
+    wet_terrain()
+
+
+def reset_map():
+    global map_coordinates, village_locations, lake_locations, pyramid_position, mountain_locations, altar_locations
+    map_coordinates = []  # contains the integer coordinates of the map elements in lists. : [row_index, column index]
+    village_locations = []  # contains the integer coordinates of the village (F) elements in lists. :
+    lake_locations = []  # integer coordinates of the Lake (V) elements in lists. : [row_index, column index]
+    pyramid_position = [0, 0]  # contains the integer coordinates of the Pyramid (P) element in lists. :
+    mountain_locations = []  # contains the integer coordinates of the Mountain (H) elements in lists. :
+    altar_locations = []  # contains the integer coordinates of the Shrine (O) elements in lists. :
+
+
+def reset_fog():
+    coordinates = range(16)
+    for num1 in coordinates:
+        for num2 in coordinates:
+            fog_map[num1][num2] = "?"
+
+generate_map()
