@@ -1,141 +1,139 @@
 from termcolor import colored
 import time
 import random
+import tkinter as tk
 
 from OOP_displays import display_village, display_rest, display_crew, display_merchant, display_shrine, \
-    display_shrine_treasure, display_curse_volcano, display_curse_geyser, display_boat, display_troll, display_tiger
+    display_curse_volcano, display_curse_geyser, display_boat, display_troll, display_tiger, \
+    display_shrine_chest, display_crocolisk, display_bandit
 
-from OOP_village_items import Treasure, Rope, Torch, Vendor
-from OOP_player import player, Whiskey, Chocolate, Meat, Medicine, Fruit, scout, scout_out, donkey, donkey_out, fight
+from OOP_village_items import Treasure, Rope, Torch, Vendor, Emerald
+from OOP_player import player, Whiskey, Elixir, Meat, Medicine, Fruit, scout, scout_out, donkey, donkey_out, fight
 from OOP_map_position import game_map
-from OOP_monsters import Troll, Tiger
+from OOP_monsters import Troll, Tiger, Crocolisk, Bandit
+
+
+#  IMAGES :
+in_village = tk.PhotoImage(file='GAME_IMAGES/in_village.png')
+trade = tk.PhotoImage(file='GAME_IMAGES/trade.png')
 
 
 class Terrain:
-    def __init__(self, cost, step, icon):
+    def __init__(self, cost, step, icon, image, label, coordinate):
+        self.name = str(type(self).__name__)
         self.cost = cost
         self.step = step
         self.icon = icon
+        self.image = image
+        self.label = label
+        self.coordinate = coordinate
+        self.monsters = []
 
     def __eq__(self, other):
         return type(self) == type(other)
 
 
 class Village(Terrain):
-    def __init__(self):
-        super().__init__(0, True, "F")
+    def __init__(self, coordinate=(0, 0)):
+        super().__init__(0, True, "F", 'GAME_IMAGES/village.png', "label_will_be_assigned_here", coordinate)
         self.villagers = {  # contains the rentable companions in the village
                           "scout": "  +1 vision",
-                          "shaman": " Medicine gives +20% energy",
-                          "wise": "   +3 reputation on new maps"
+                          "shaman": " Medicine gives +20% health points, heals you in combat",
+                          "wise": "   +100 gold on new maps"
                          }
         self.vendor = Vendor()
 
-    def in_village(self):
+    def buy(self, item):
+
+        if item == "elixir":
+            item = Elixir(1)
+        elif item == "meat":
+            item = Meat(1)
+        elif item == "whiskey":
+            item = Whiskey(1)
+        elif item == "medicine":
+            item = Medicine(1)
+        elif item == "fruit":
+            item = Fruit(1)
+        elif item == "rope":
+            item = Rope(1)
+        elif item == "torch":
+            item = Torch(1)
+        else:
+            item = None
+            print("VILLAGE_SELF NOT ASSOCIATED AN ITEM. REKT.")
+
+        if item is not None:
+            for element in self.vendor.contents:
+                if item.pieces <= element.pieces and item.pieces * element.price <= player.gold:
+                    self.vendor.sell_item(item)
+                    player.inventory.add_item(item)
+                    player.gold -= item.pieces * int(element.price * 0.9) \
+                        if "trader" in player.companions else item.pieces * element.price
+                    if "trader" in player.companions:
+                        print("You saved " +
+                              colored(str((item.pieces * element.price) -
+                                          int(item.pieces * element.price * 0.9)), "yellow") +
+                              " gold. Thanks to your Trader!")
+                    print("My gold: " + colored(str(player.gold), "yellow"))
+                    break
+                print("Not enough item or gold.")
+                break
+
+    @staticmethod
+    def sell(item):
+
+        if item == "elixir":
+            item = Elixir(1)
+        elif item == "meat":
+            item = Meat(1)
+        elif item == "whiskey":
+            item = Whiskey(1)
+        elif item == "medicine":
+            item = Medicine(1)
+        elif item == "fruit":
+            item = Fruit(1)
+        elif item == "rope":
+            item = Rope(1)
+        elif item == "torch":
+            item = Torch(1)
+        else:
+            item = None
+            print("VILLAGE_SELF NOT ASSOCIATED AN ITEM. REKT.")
+
+        for element in player.inventory.contents:
+            if item == element:
+                if item.pieces <= element.pieces:
+                    player.inventory.remove_item(item)
+                    print()
+                    player.gold += item.pieces * int(item.price * 1.1) \
+                        if "trader" in player.companions else item.pieces * element.price
+
+                    if "trader" in player.companions:
+                        print("You earned " +
+                              colored(str(int(item.pieces * element.price * 1.1) -
+                                          (item.pieces * element.price)), "yellow") +
+                              " extra gold. Thanks to your Trader!")
+                    print("My gold: " + colored(str(player.gold), "yellow"))
+                    break
+                print("You don't have that many")
+                break
+
+    @staticmethod
+    def rest():
+        player.energy += 4
+        if int(player.energy) > 96:
+            player.energy = 100
+
+    def in_village_old(self):
+
         while True:
 
             display_village()
             choice = input("For trading enter 'trade', for resting 'rest', for hiring 'hire'"
                            " or hit 'Q' to leave the village ").lower()
-            if choice == "trade":
-                self.display_vendor()
 
-                while True:
-                    buy_sell = input("Enter 'b' to buy, 's' to sell, 'i' to check inventory, 'Q' to exit: ")
-                    if buy_sell == "b":
-                        item = input("choose an item (type the name), or hit ENTER to exit: ").lower()
-                        if item == "chocolate".lower():
-                            item = Chocolate(int(input("how many would you like to buy? (enter a number) ")))
-                        elif item == "meat".lower():
-                            item = Meat(int(input("how many would you like to buy? (enter a number) ")))
-                        elif item == "whiskey".lower():
-                            item = Whiskey(int(input("how many would you like to buy? (enter a number) ")))
-                        elif item == "medicine".lower():
-                            item = Medicine(int(input("how many would you like to buy? (enter a number) ")))
-                        elif item == "fruit".lower():
-                            item = Fruit(int(input("how many would you like to buy? (enter a number) ")))
-                        else:
-                            print("The merchant doesn't sell that item")
-                            break
-                        print(item.pieces)
-                        for element in self.vendor.contents:
-                            if item.pieces <= element.pieces and item.pieces * element.price <= player.gold:
-                                self.vendor.sell_item(item)
-                                player.inventory.add_item(item)
-                                player.gold -= item.pieces * int(element.price * 0.9) \
-                                    if "trader" in player.companions else item.pieces * element.price
-                                if "trader" in player.companions:
-                                    print("You saved " +
-                                          colored(str((item.pieces * element.price) -
-                                                      int(item.pieces * element.price * 0.9)), "yellow") +
-                                          " gold. Thanks to your Trader!")
-                                print("My gold: " + colored(str(player.gold), "yellow"))
-                                break
-                            print("Not enough item or gold.")
-                            break
-
-                    elif buy_sell == "s":
-                        item = input("choose an item (type the name), or hit Q to exit: ").lower()
-                        if item == "chocolate".lower():
-                            item = Chocolate(int(input("how many would you like to sell? (enter a number) ")))
-                        elif item == "meat".lower():
-                            item = Meat(int(input("how many would you like to sell? (enter a number) ")))
-                        elif item == "whiskey".lower():
-                            item = Whiskey(int(input("how many would you like to sell? (enter a number) ")))
-                        elif item == "medicine".lower():
-                            item = Medicine(int(input("how many would you like to sell? (enter a number) ")))
-                        elif item == "fruit".lower():
-                            item = Fruit(int(input("how many would you like to suy? (enter a number) ")))
-                        else:
-                            print("You don't have that in your Inventory")
-                            break
-
-                        for element in player.inventory.contents:
-                            if item.pieces <= element.pieces:
-                                player.inventory.remove_item(item)
-                                print()
-                                player.gold += item.pieces * int(element.price * 1.1) \
-                                    if "trader" in player.companions else item.pieces * element.price
-
-                                if "trader" in player.companions:
-                                    print("You earned " +
-                                          colored(str(int(item.pieces * element.price * 1.1) -
-                                                      (item.pieces * element.price)), "yellow") +
-                                          " extra gold. Thanks to your Trader!")
-                                print("My gold: " + colored(str(player.gold), "yellow"))
-                                break
-                            print("You don't have that many")
-                            break
-
-                    elif buy_sell == "i":
-                        self.display_vendor()
-
-                    elif buy_sell == "q":
-                        break
-
-            elif choice == "rest":  # restoring energy
-                if player.energy < 100:
-                    print("\n" * 10)
-                    display_rest()
-                    print()
-                    print("You are resting in this fancy bed!")
-                    print("     min _________________________ max")
-                    print("energy: |" + colored(str(int(player.energy / 4) * u"\u25A0"), "green"), end='')
-                    while int(player.energy) <= 96:
-                        time.sleep(0.5)  # every 0.5 seconds we add +4 to the current energy
-                        player.energy += 4
-                        print(colored(str(u"\u25A0"), "green"),
-                              end='')  # with the "end=''" parameter the bar is adding up
-                        if int(player.energy) > 96:
-                            player.energy = 100
-                    print()
-                    print("Rise and Shine beautiful! You are rested!")
-                    input(" ")
-                else:
-                    print("You are rested already... Go and kick some asses You lazy pig!")
-                    input(" ")
-
-            elif choice == "hire":
+            if choice == "hire":
                 display_crew()
                 print("WOW! Your reputation precedes you! These villagers offer their services for you. (for 150 gold)")
                 for villager in self.villagers:
@@ -153,8 +151,6 @@ class Village(Terrain):
                 break
 
     def display_vendor(self):
-        display_merchant()
-
         print("ITEM, AMOUNT, COST")
         for e in self.vendor.contents:
             print(str(e) + ",  " + str(int(e.price * 0.9) if "trader" in player.companions else e.price))
@@ -180,63 +176,68 @@ class Village(Terrain):
 
 
 class Sea(Terrain):
-    def __init__(self):
-        super().__init__(0, False, "T")
+    def __init__(self, coordinate=(0, 0)):
+        super().__init__(0, False, "T", "GAME_IMAGES/sea.png", "label_will_be_assignes_here", coordinate)
 
 
 class Ship(Terrain):
-    def __init__(self):
-        super().__init__(0, True, "C")
+    def __init__(self, coordinate=(0, 0)):
+        super().__init__(0, True, "C", "GAME_IMAGES/ship.png", "label_will_be_assignes_here", coordinate)
         self.crew = {  # contains the rentable companions in the ship
                      "trader": "    10% price bonus for trading",
-                     "soldier": "   Whiskey gives + 20% Energy",
+                     "soldier": "   Whiskey gives + 20% Energy, fight beside you in combat",
                      "donkey": "    +2 inventory slots"
                     }
 
     def in_boat(self):
-        while True:
+        if Emerald() in player.inventory.contents:
+            pass
+        else:
+            while True:
+                # clear_screen()
+                display_boat()
+                choice = input("For resting type 'rest', for hiring 'hire' or hit 'Q' to leave the Ship ").lower()
 
-            display_boat()
-            choice = input("For resting type 'rest', for hiring 'hire' or hit 'Q' to leave the village ").lower()
+                if choice == "rest":  # restoring energy
+                    # clear_screen()
+                    if player.energy < 100:
+                        print("\n" * 10)
+                        display_rest()
+                        print()
+                        print("You are resting in this fancy bed!")
+                        print("     min _________________________ max")
+                        print("energy: |" + colored(str(int(player.energy / 4) * u"\u25A0"), "green"), end='')
+                        while int(player.energy) <= 96:
+                            time.sleep(0.5)  # every 0.5 seconds we add +4 to the current energy
+                            player.energy += 4
+                            print(colored(str(u"\u25A0"), "green"),
+                                  end='')  # with the "end=''" parameter the bar is adding up
+                            if int(player.energy) > 96:
+                                player.energy = 100
+                        print()
+                        print("Rise and Shine beautiful! You are rested!")
+                        input(" ")
+                    else:
+                        print("You are rested already... Go and kick some asses You lazy pig!")
+                        input(" ")
 
-            if choice == "rest":  # restoring energy
-                if player.energy < 100:
-                    print("\n" * 10)
-                    display_rest()
-                    print()
-                    print("You are resting in this fancy bed!")
-                    print("     min _________________________ max")
-                    print("energy: |" + colored(str(int(player.energy / 4) * u"\u25A0"), "green"), end='')
-                    while int(player.energy) <= 96:
-                        time.sleep(0.5)  # every 0.5 seconds we add +4 to the current energy
-                        player.energy += 4
-                        print(colored(str(u"\u25A0"), "green"),
-                              end='')  # with the "end=''" parameter the bar is adding up
-                        if int(player.energy) > 96:
-                            player.energy = 100
-                    print()
-                    print("Rise and Shine beautiful! You are rested!")
-                    input(" ")
-                else:
-                    print("You are rested already... Go and kick some asses You lazy pig!")
-                    input(" ")
+                elif choice == "hire":
+                    # clear_screen()
+                    display_crew()
+                    print("Some of your Crew members are ready to help you! for some gold... (150 each)")
+                    for crew_member in self.crew:
+                        print(crew_member, self.crew[crew_member])
+                    print("current gold: " + colored(str(player.gold), "yellow"))
+                    chosen_companion = input("Type the name of the chosen companion!")
+                    if player.gold >= 150:
+                        self.add_companion(chosen_companion)
+                        player.gold -= 150
+                        print(player.companions)
+                    else:
+                        input("You don't have enough gold! Come back when You have 150 gold")
 
-            elif choice == "hire":
-                display_crew()
-                print("Some of your Crew members are ready to help you! for some gold... (150 each)")
-                for crew_member in self.crew:
-                    print(crew_member, self.crew[crew_member])
-                print("current gold: " + colored(str(player.gold), "yellow"))
-                chosen_companion = input("Type the name of the chosen companion!")
-                if player.gold >= 150:
-                    self.add_companion(chosen_companion)
-                    player.gold -= 150
-                    print(player.companions)
-                else:
-                    input("You don't have enough gold! Come back when You have 150 gold")
-
-            elif choice == "q".lower():
-                break
+                elif choice == "q".lower():
+                    break
 
     def add_companion(self, companion):
         if len(player.companions) >= 3:
@@ -250,84 +251,128 @@ class Ship(Terrain):
 
 
 class Lake(Terrain):
-    def __init__(self):
-        super().__init__(0, False, "V")
+    def __init__(self, coordinate=(0, 0)):
+        super().__init__(0, False, "V", "GAME_IMAGES/lake.png", "label_will_be_assignes_here", coordinate)
 
 
 class Pyramid(Terrain):
-    def __init__(self):
-        super().__init__(0, True, "P")
+    def __init__(self, coordinate=(0, 0)):
+        super().__init__(0, True, "P", "GAME_IMAGES/pyramid.png", "label_will_be_assignes_here", coordinate)
+        self.empty = False
+
+    def in_pyramid(self):
+        if self.empty:
+            input("You have already cleared this Cave...")
+        else:
+            player.inventory.add_item(Emerald(1))
+            self.empty = True
+            return tk.PhotoImage("GAME_IMAGES/jungle.png")
 
 
 class Mountain(Terrain):
-    def __init__(self):
-        super().__init__(0, False, "H")
+    def __init__(self, coordinate=(0, 0)):
+        super().__init__(0, False, "H", "GAME_IMAGES/mountain.png", "label_will_be_assignes_here", coordinate)
 
 
 class Meadow(Terrain):
-    def __init__(self, cost=1):
-        super().__init__(cost, True, ".")
+    def __init__(self, cost=1, coordinate=(0, 0)):
+        super().__init__(cost, True, ".", "GAME_IMAGES/meadow.png", "label_will_be_assignes_here", coordinate)
         self.wet = False
+        self.monsters = [Bandit, Crocolisk]
 
     def if_wet(self):
         if self.wet:
             self.cost = 2
+            if type(self.image) == str:
+                self.image = "GAME_IMAGES/wet_meadow.png"
+            else:
+                self.image = tk.PhotoImage(name='GAME_IMAGES/wet_meadow.png')
+
+    def attacked(self):
+        fight_chance = random.randint(1, 100)
+        threshold = 15 if self.wet else 3
+        monster_type = 1 if self.wet else 0
+
+        if fight_chance <= threshold:
+            monster = self.monsters[monster_type]()
+            if monster_type == 0:
+                display_bandit()
+            else:
+                display_crocolisk()
+            input("A " + monster.name + " attacked you!")
+            fight(monster)
 
 
 class Jungle(Terrain):
-    def __init__(self, cost=3):
-        super().__init__(cost, True, "J")
+    def __init__(self, cost=3, coordinate=(0, 0)):
+        super().__init__(cost, True, "J", "GAME_IMAGES/jungle.png", "label_will_be_assignes_here", coordinate)
         self.wet = False
+        self.monsters = [Troll, Crocolisk]
 
     def if_wet(self):
         if self.wet:
             self.cost = 6
+            if type(self.image) == str:
+                self.image = "GAME_IMAGES/wet_jungle.png"
+            else:
+                self.image = tk.PhotoImage(name='GAME_IMAGES/wet_jungle.png')
 
-    @staticmethod
-    def attacked():
+    def attacked(self):
         fight_chance = random.randint(1, 100)
-        if fight_chance <= 3:
-            troll = Troll()
-            display_troll()
-            input("A jungle Troll attacked you! He is holding a " + str(troll.weapon[0]) + " in his hand!")
-            fight(troll)
+        threshold = 30 if self.wet else 3
+        monster_type = 1 if self.wet else 0
+
+        if fight_chance <= threshold:
+            monster = self.monsters[monster_type]()
+            if monster_type == 0:
+                display_troll()
+            else:
+                display_crocolisk()
+            input("A " + monster.name + " attacked you!")
+            fight(monster)
 
 
 class Thicket(Terrain):
-    def __init__(self, cost=2):
-        super().__init__(cost, True, "R")
+    def __init__(self, cost=2, coordinate=(0, 0)):
+        super().__init__(cost, True, "R", "GAME_IMAGES/thicket.png", "label_will_be_assignes_here", coordinate)
         self.wet = False
+        self.monsters = [Tiger, Crocolisk]
 
     def if_wet(self):
         if self.wet:
             self.cost = 4
+            if type(self.image) == str:
+                self.image = "GAME_IMAGES/wet_thicket.png"
+            else:
+                self.image = tk.PhotoImage(name='GAME_IMAGES/wet_thicket.png')
 
-    @staticmethod
-    def attacked():
+    def attacked(self):
         fight_chance = random.randint(1, 100)
-        if fight_chance <= 3:
-            tiger = Tiger()
-            display_tiger()
-            input("A Prowling Tiger attacked you!")
-            fight(tiger)
+        threshold = 20 if self.wet else 3
+        monster_type = 1 if self.wet else 0
+
+        if fight_chance <= threshold:
+            monster = self.monsters[monster_type]()
+            if monster_type == 0:
+                display_tiger()
+            else:
+                display_crocolisk()
+            input("A " + monster.name + " attacked you!")
+            fight(monster)
 
 
 class Lava(Terrain):
-    def __init__(self):
-        super().__init__(10, True, "L")
+    def __init__(self, coordinate=(0, 0)):
+        super().__init__(10, True, "L", "GAME_IMAGES/lava.png", "label_will_be_assignes_here", coordinate)
 
     @staticmethod
     def damage():
-        player.health_point -= 25
-
-
-moves = 0
-four_steps = []
+        player.health_point -= 15
 
 
 class Altar(Terrain):
-    def __init__(self):
-        super().__init__(0, True, "O")
+    def __init__(self, coordinate=(0, 0)):
+        super().__init__(0, True, "O", "GAME_IMAGES/altar.png", "label_will_be_assignes_here", coordinate)
         self.empty = False
 
     def in_altar(self):
@@ -336,27 +381,35 @@ class Altar(Terrain):
         if self.empty:
             print("You have already cleared this shrine...")
         else:
+            input("As you enter the shrine, you see an old chest... It may be cursed.")
+            display_shrine_chest()
             input("What do you do? loot the chest and face the consequences, or run away and never look back?")
             loot = input("type 'loot' or hit enter you run away... ")
             if loot == "loot":
-                display_shrine_treasure()
+                input("There is a Treasure in the chest!")
                 player.inventory.add_item(Treasure(1))
+                self.empty = True
                 curse_chance = random.randint(1, 101)  # 80% chance on a curse. If curse happens:
                 if curse_chance <= 100:
                     player.energy -= 15
-                    input("The chanthing stopped... but the earthquake got stronger... You looked up and...")
+                    input("As you touch the treasure, a chill goes down your spine... There is something wrong...")
                     x = random.randint(1, 100)  # 35% chance on volcano curse, 65% chance on geyser curse
                     if x <= 35:
+                        input("You feel the ground shaking. You run out of the shrine and...")
                         display_curse_volcano()
+                        input("The closest mountain to you turned into a Volcano.")
                         input("'What have I done?' You are thinking... but It's too late for regrets now...")
-                        four_steps.append(moves)  # save current move number, so after 4 steps it can be used again.
+                        # four_steps.append(steps)  # save current move number, so after 4 steps it can be used again.
                         curse_volcano(game_map, player.position)
                     else:
+                        input("You feel the ground shaking. You run out of the shrine and...")
                         display_curse_geyser()
+                        input("The closest lake to you turned into a Geyser.")
                         input("'What have I done?' You are thinking... but It's too late for regrets now...")
                         curse_geyser(game_map, player.position)
 
                 else:
+                    input("You grab the treasure, and run out with it.")
                     input("Next time You might not be this lucky...")
 
             else:
@@ -364,8 +417,8 @@ class Altar(Terrain):
 
 
 class Sanctuary(Terrain):
-    def __init__(self):
-        super().__init__(0, True, "S")
+    def __init__(self, coordinate=(0, 0)):
+        super().__init__(0, True, "S", "GAME_IMAGES/sanctuary.png", "label_will_be_assignes_here", coordinate)
         self.empty = False
 
     def in_sanctuary(self):
@@ -373,36 +426,51 @@ class Sanctuary(Terrain):
         if self.empty:
             input("You have already cleared this Sanctuary...")
         else:
-            player.inventory.add_item(Treasure())
-
+            player.inventory.add_item(Treasure(1))
+            self.empty = True
+            input("The Sanctuary is built up in the mountaintops. There is an old bridge you have to cross...\n"
+                  "it does not look safe.")
             if Rope() in player.inventory.contents:
                 player.inventory.remove_item(Rope(1))
-                print("You used up a rope to secure yourself on the cliff")
+                input("But you have a rope in your backpack! You manage to secure yourself and cross the bridge")
+
             else:
                 bad_luck = random.randint(1, 101)
                 if bad_luck <= 50:
-                    input("Catastrophe will happen!")
+                    input("You try to take small steps, and balance your weight on the old brige.")
+                    input("You hear a creek. The bridge starts to move. Your heart is bumping in your throat")
+                    input("The bridge is breaking down! You try to run and manage to grab the edge of the cliff...")
                     catastrophe()
 
                 elif 51 <= bad_luck <= 70:
-                    input("Curse will happen!")
+                    input("As you walk through the abandoned Sanctuary, a puff of chilly wind hits yu from behind.")
+                    input("You have a very bad feeling about this place...")
                     curse_chance = random.randint(1, 101)
                     if curse_chance <= 65:
+                        input("The ground start to shake... You look around and see...")
                         display_curse_geyser()
+                        input("The closest lake to you turned into a Geyser.")
+                        input("'What have I done?' You are thinking... but It's too late for regrets now...")
                         curse_geyser(game_map, player.position)
 
                     else:
-                        four_steps.append(moves)
+                        input("The ground start to shake... You look around and see...")
                         display_curse_volcano()
+                        input("The closest mountain to you turned into a Volcano.")
+                        input("'What have I done?' You are thinking... but It's too late for regrets now...")
                         curse_volcano(game_map, player.position)
 
                 else:
-                    input("Nothing will happen!")
+                    input("You rush forward to the Sanctuary...")
+
+            display_shrine_chest()
+            input("At the Sanctuary you see a big old Chest. You open it...")
+            input("There is a treasure in it! It probably worth a few gold pieces!")
 
 
 class Cave(Terrain):
-    def __init__(self):
-        super().__init__(0, True, "B")
+    def __init__(self, coordinate=(0, 0)):
+        super().__init__(0, True, "B", "GAME_IMAGES/cave.png", "label_will_be_assignes_here", coordinate)
         self.empty = False
 
     def in_cave(self):
@@ -410,17 +478,26 @@ class Cave(Terrain):
         if self.empty:
             input("You have already cleared this Cave...")
         else:
-            player.inventory.add_item(Treasure())
+            player.inventory.add_item(Treasure(1))
+            self.empty = True
+            input("You enter the cave... It's cold... and dark...")
             if Torch() in player.inventory.contents:
                 player.inventory.remove_item(Torch(1))
-                print("You burnt 1 torch in the Cave and avoided catastrophe")
+                input("You manage to light the torch you are carrying.")
+                input("The deep cave is now glowing orange as your torch's light sheds dark shadows.")
             else:
                 catastrophe_chance = random.randint(1, 101)
                 if catastrophe_chance <= 65:
-                    input('CATASTROOOPHE')  # not here
+                    input("It is so dark, you can't see anything...")  # not here
+                    input("You get lost in the cave... It's going to be rough to get out...")
                     catastrophe()
                 else:
-                    input("you got lucky! catastrophe could have happened!")
+                    input("You are slowly heading towards the other end of the tunnel...")
+
+            display_shrine_chest()
+            input("At the depths of the cave You kick into something. It looks like a Chest. You open it...")
+            input("There is a treasure in it! Someone probably hid it here. \n "
+                  "It will most likely has a good price in the villages.")
 
 
 Volcano_coordinate = []  # coordinates of H-s being changed to volcanos (@)
@@ -566,9 +643,9 @@ def traitor():
     companion = random.choice(list(player.companions))
     item = random.choice(list(player.inventory.contents))
     if item == Treasure():
-        input("Your " + companion + " companion betrayed you! He took the " + item + " and run away with it...")
+        input("Your " + companion + " companion betrayed you! He took the " + item.name + " and run away with it...")
     else:
-        input("Your " + companion + " companion betrayed you! He left your group and stole 1 " + item +
+        input("Your " + companion + " companion betrayed you! He left your group and stole 1 " + item.name +
               " from you backpack...")
     del player.companions[companion]
     player.inventory.remove_item(item(1))
