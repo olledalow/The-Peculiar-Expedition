@@ -5,30 +5,33 @@ Read more: Hungarian description of the game: 07_feladat.pdf NOTE: Some rules ar
 
 ## About the game
 
-Play as an adventurer on a mystical island. The player starts at the shores on the ship He/She arrived with.
-The goal is to find the golden pyramid, collect It's treasure, and return with it to the ship. 
-There are 5 pyramids, in 5 islands. If the player is able to collect them all, He/She wins.
-The rest of the rules will be stated in the game while running.
+You are an adventurer who sails on mystical islands to collect Treasures. The main goal is to find the golden Pyramid and collect the mythical Emerald Treasure from It’s chambers. Once You obtain the Emerald, take it back on your ship and sail away with it. If you are able to collect 5 Emeralds from 5 different islands, You Win!
 
 ```bash
-move with 'w a s d': <'a' and hit enter> 
+move with 'w a s d', use cursor to click on the interactive buttons
 ```
+
+## How to play
+
+Your character has 3 attributes:
+• Health point: decreases in combat. You need to use medicine to regain the points.
+• Energy: decreases while moving on the map and during combat. Eat food, drink or
+rest to regain points.
+• Mana points: decreases while using spells during combat. Drink elixir to regain
+points.
+If your character reaches 0 health point or 0 energy, you lose.
+Move on the map with the ‘W A S D’ buttons. The highlighted terrain is the one you are currently in. Each terrain type is uniqe. Some requires more energy to move through than others. The ship, Villages, Caves, Altars, Sanctuaries and Pyramids are interactive terrains. Once you are in one of these terrains on the map, you can do different things at these places. See the action window on the left side of the window.
+See your inventory or your companion brigade with the buttons below the action window.
 
 ## How to run
 
-run the OOP_GUI.py file in a Python IDE.
-
-or:
-
-Terminal:
-make the files executable with: chmod +x filename   
-Call the interpreter: python3 OOP_GUI.py  
+- Windows: unzip the LAUNCHER.zip file, open the folder and run the launcher.exe file. note: python3 is required.
+- Windows/MacOS/Unix : download all the files, unzip the ADVENTURE_TEXT.zip and the GAME_IMAGES.zip files. run the GUI.py file in a Python IDLE (Pycharm is recommended).
 
 ## Note
 
 The game is in an early stage, It's still under development.
-The game consists of 8 python (.py) files and 1 folder containing the images for the GUI.
-The Graphical User Interface is made with tkinter.   
+The Graphical User Interface is made with tkinter, no 3rd party application was used.
 In order to play the game keyboard and mouse is required.
               
 Built with Python3.
